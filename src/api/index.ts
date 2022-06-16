@@ -17,5 +17,5 @@ router.get('/qr/generate', async (ctx) => {
 
   const code = await qrcode(content)
 
-  ctx.response.body = code.createDataURL()
+  ctx.response.body = code
 })

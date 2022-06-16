@@ -9,6 +9,13 @@ app.use(async (ctx, next) => {
   await next()
 })
 
+app.use((ctx, next) => {
+  ctx.response.headers.set('Access-Control-Allow-Origin', '*')
+  ctx.response.headers.set('Access-Control-Allow-Headers', '*')
+
+  return next()
+})
+
 app.use(router.routes(), router.allowedMethods())
 
 console.log('http://localhost:8000')
