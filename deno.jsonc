@@ -2,5 +2,10 @@
   "tasks": {
     "dev": "deno run --allow-net --allow-env --allow-read=. --watch ./src/index.ts"
   },
-  "importMap": "./import_map.json"
+  "importMap": "./import_map.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
+  }
 }
