@@ -1,21 +1,36 @@
-import { Router } from 'oak'
+import { FormDataReader, Router } from 'oak'
 import { qrcode } from 'https://deno.land/x/qrcode@v2.0.0/mod.ts'
 import { toUint8Array } from 'https://deno.land/x/base64@v0.2.1/mod.ts'
+import {
+  decode,
+  GIF,
+  Image,
+} from 'https://deno.land/x/imagescript@v1.2.13/mod.ts'
+import jsqr from 'https://cdn.skypack.dev/jsqr@v1.4.0?dts'
 import { html } from './intro.tsx'
 
 export const router = new Router()
-
-interface QrScanParams {
-  file: Blob
-}
 
 router.get('/', (ctx) => {
   ctx.response.body = html
 })
 
 router.post('/qr/scan', async (ctx) => {
-  // const body: FormDataReader = ctx.request.body().value
-  // body
+  const body = ctx.request.body().value as FormDataReader
+  const form = await body.read()
+  const file = form.files?.[0]
+  if (!file?.filename) {
+    throw Error('Not found file')
+  }
+
+  const imgData = await Deno.readFile(file.filename)
+  const imgInfo = await decode(imgData)
+
+  const imgBuffer = (imgInfo as Image).bitmap || (imgInfo as GIF).at(0)?.bitmap
+
+  const code = jsqr(imgBuffer, imgInfo.width, imgInfo.height)
+
+  ctx.response.body = code?.data
 })
 
 router.get('/qr/generate', async (ctx) => {
