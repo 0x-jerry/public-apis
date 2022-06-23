@@ -7,12 +7,12 @@ import {
   Image,
 } from 'https://deno.land/x/imagescript@v1.2.13/mod.ts'
 import jsqr from 'https://cdn.skypack.dev/jsqr@v1.4.0?dts'
-import { html } from './intro.tsx'
+import { htmlString } from './intro.tsx'
 
 export const router = new Router()
 
 router.get('/', (ctx) => {
-  ctx.response.body = html
+  ctx.response.body = htmlString
 })
 
 router.post('/qr/scan', async (ctx) => {
