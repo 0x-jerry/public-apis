@@ -1,57 +1,22 @@
 import { h, renderSSR } from 'https://deno.land/x/nano_jsx@v0.0.32/mod.ts'
 
-interface APIItemProps {
-  path: string
-  children?: APIItemProps[]
-}
-
-function APIItem({ path, children }: APIItemProps) {
-  if (children?.length) {
-    const item = children.map((api) => (
-      <APIItem path={path + '/' + api.path} children={api.children}></APIItem>
-    ))
-    return <ul>{item}</ul>
-  }
-
-  return <li>{path}</li>
-}
+import * as gfm from 'https://deno.land/x/gfm@0.1.20/mod.ts'
 
 function App() {
-  const api: APIItemProps[] = [
-    {
-      path: 'qr',
-      children: [
-        {
-          path: 'generate',
-        },
-        {
-          path: 'scan',
-        },
-      ],
-    },
-  ]
+  const intro = Deno.readTextFileSync('./readme.md')
+  const md = gfm.render(intro)
 
   return (
     <html>
       <head>
         <title>Deno Deploy API</title>
       </head>
+      <style>{gfm.CSS}</style>
       <body>
-        <h1> Deno Deploy API</h1>
-        <h3>
-          Github:&nbsp;
-          <a href="https://github.com/0x-jerry/dd-api" target="_blank">
-            https://github.com/0x-jerry/dd-api
-          </a>
-        </h3>
-        <div>
-          <h3>API List:</h3>
-          <div>
-            {api.map((item) => (
-              <APIItem {...item}></APIItem>
-            ))}
-          </div>
-        </div>
+        <div
+          style={{ width: '768px', margin: 'auto' }}
+          dangerouslySetInnerHTML={{ __html: md }}
+        ></div>
       </body>
     </html>
   )
