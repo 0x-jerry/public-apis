@@ -3,9 +3,8 @@ import { h, renderSSR } from 'https://deno.land/x/nano_jsx@v0.0.32/mod.ts'
 import * as gfm from 'https://deno.land/x/gfm@0.1.20/mod.ts'
 import 'https://esm.sh/prismjs@1.28.0/components/prism-typescript?no-check'
 
-function App() {
-  const intro = Deno.readTextFileSync('./readme.md')
-  const md = gfm.render(intro)
+function App(props: { markdown: string }) {
+  const md = gfm.render(props.markdown)
 
   return (
     <html>
@@ -33,4 +32,8 @@ function App() {
   )
 }
 
-export const html = renderSSR(<App />)
+export const html = async () => {
+  const intro = await Deno.readTextFile('./readme.md')
+
+  return renderSSR(<App markdown={intro} />)
+}
