@@ -2,6 +2,5 @@
   "deno.enable": true,
   "deno.lint": true,
   "deno.unstable": true,
-  "editor.formatOnSave": true,
-  "deno.importMap": "./import_map.json"
+  "editor.formatOnSave": true
 }
