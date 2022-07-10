@@ -1,5 +1,5 @@
 import { apiRoot } from './setup.ts'
-import { assertEquals } from 'https://deno.land/std@0.96.0/testing/asserts.ts'
+import { assertEquals } from 'https://deno.land/std@0.147.0/testing/asserts.ts'
 
 Deno.test('qr scan', async () => {
   const img = await fetch(apiRoot + '/qr/generate?c=1234')

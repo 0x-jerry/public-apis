@@ -1,7 +1,7 @@
 import { apiRoot } from './setup.ts'
-import { assertEquals } from 'https://deno.land/std@0.96.0/testing/asserts.ts'
+import { assertSnapshot } from 'https://deno.land/std@0.147.0/testing/snapshot.ts'
 
-Deno.test('transform json to typescript', async () => {
+Deno.test('transform json to typescript', async (t) => {
   const test = {
     a: 1,
   }
@@ -16,10 +16,10 @@ Deno.test('transform json to typescript', async () => {
 
   const ts = await res.text()
 
-  assertEquals(ts, 'interface RootInterface {\n  a: number;\n}\n\n')
+  assertSnapshot(t, ts)
 })
 
-Deno.test('transform json to rust serde', async () => {
+Deno.test('transform json to rust serde', async (t) => {
   const test = {
     a: 1,
   }
@@ -27,20 +27,17 @@ Deno.test('transform json to rust serde', async () => {
   const res = await fetch(apiRoot + '/transform/json', {
     method: 'post',
     body: JSON.stringify({
-      lang: 'rust-serde',
+      lang: 'rust',
       json: JSON.stringify(test),
     }),
   })
 
   const rust = await res.text()
 
-  assertEquals(
-    rust,
-    '#[derive(Serialize, Deserialize)]\nstruct RootInterface {\n  a: i64,\n}\n\n'
-  )
+  assertSnapshot(t, rust)
 })
 
-Deno.test('transform json use get', async () => {
+Deno.test('transform json use get', async (t) => {
   const test = {
     a: 1,
   }
@@ -53,5 +50,5 @@ Deno.test('transform json use get', async () => {
 
   const ts = await res.text()
 
-  assertEquals(ts, 'interface RootInterface {\n  a: number;\n}\n\n')
+  assertSnapshot(t, ts)
 })

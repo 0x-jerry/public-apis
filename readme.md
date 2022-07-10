@@ -43,7 +43,7 @@ assertEquals(txt, '1234')
 
 ## /transform/json
 
-Use [transform-json-types](https://github.com/transform-it/transform-json-types) to transform json to types.
+Use [quicktype-core](https://github.com/quicktype/quicktype) to transform json to types.
 
 Usage:
 
