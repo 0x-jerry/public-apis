@@ -1,20 +1,14 @@
-import { assertEquals } from 'https://deno.land/std/testing/asserts.ts'
-
-import { join as pJoin, fromFileUrl } from 'https://deno.land/std/path/mod.ts'
-
-const root = 'http://localhost:8000'
-
-const join = (...args: string[]) =>
-  pJoin(fromFileUrl(import.meta.url), '..', ...args)
+import { apiRoot } from './setup.ts'
+import { assertEquals } from 'https://deno.land/std@0.96.0/testing/asserts.ts'
 
 Deno.test('qr scan', async () => {
-  const img = await fetch(root + '/qr/generate?c=1234')
+  const img = await fetch(apiRoot + '/qr/generate?c=1234')
   const imgBlob = await img.blob()
 
   const form = new FormData()
   form.set('file', imgBlob)
 
-  const r = await fetch(root + '/qr/scan', {
+  const r = await fetch(apiRoot + '/qr/scan', {
     method: 'post',
     body: form,
   })
@@ -24,7 +18,7 @@ Deno.test('qr scan', async () => {
 })
 
 Deno.test('qr generate', async () => {
-  const r = await fetch(root + '/qr/generate?c=1234')
+  const r = await fetch(apiRoot + '/qr/generate?c=1234')
   const file = await r.blob()
 
   assertEquals(file.type, 'image/gif')
