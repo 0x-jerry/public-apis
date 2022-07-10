@@ -63,5 +63,5 @@ const res = await fetch(url)
 
 const ts = await res.text()
 
-assertEquals(ts, 'interface RootInterface {\n  a: number;\n}\n\n')
+console.log(ts)
 ```
