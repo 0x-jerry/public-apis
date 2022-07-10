@@ -57,6 +57,7 @@ const test = {
 const url = new URL(apiRoot + '/transform/json?')
 url.searchParams.set('lang', 'typescript')
 url.searchParams.set('json', JSON.stringify(test))
+url.searchParams.set('name', 'APIInterface')
 
 const res = await fetch(url)
 
