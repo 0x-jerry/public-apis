@@ -23,7 +23,7 @@ snapshot[`transform json to rust serde 1`] = `
 
 extern crate serde_derive;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Root {
     #[serde(rename = "a")]
     pub a: i64,

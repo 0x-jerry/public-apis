@@ -47,9 +47,12 @@ async function quicktypeJSON(
   inputData.addInput(jsonInput)
 
   const option: any = {
+    // typescript
     'just-types': true,
     'runtime-typecheck': false,
+    // rust
     visibility: 'public',
+    'derive-debug': true,
   }
 
   const result = await quicktype({
