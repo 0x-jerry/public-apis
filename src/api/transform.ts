@@ -9,7 +9,11 @@ import {
 export const router = new Router()
 
 router.post('/json', async (ctx) => {
-  const data = await ctx.request.body().value
+  const body = ctx.request.body()
+
+  const data =
+    body.type === 'text' ? JSON.parse(await body.value) : await body.value
+
   const { json, lang, name = 'root' } = JSON.parse(data)
 
   const result = await quicktypeJSON(lang, name, json)

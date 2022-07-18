@@ -65,3 +65,24 @@ const ts = await res.text()
 
 console.log(ts)
 ```
+
+## /preview/metadata
+
+Use [link-preview-js](https://github.com/ospfranco/link-preview-js) to get metadata of a web site
+
+Usage:
+
+```ts
+const apiRoot = 'https://0x-jerry-dd-api.deno.dev'
+
+const res = await fetch(apiRoot + '/preview/metadata', {
+  method: 'post',
+  body: JSON.stringify({
+    url: 'https://www.bilibili.com/bangumi/play/ep471910',
+  }),
+})
+
+const metadata = await res.json()
+
+console.log(metadata)
+```
