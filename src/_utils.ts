@@ -1,5 +1,4 @@
 export async function get(url: URL | string, query?: Record<string, unknown>) {
-
   const u = new URL(url)
 
   if (query) {

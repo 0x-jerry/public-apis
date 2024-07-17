@@ -2,6 +2,7 @@ import { app } from './_app.ts'
 import { get } from './_utils.ts'
 import { parse } from '@libs/xml'
 import { Feed } from 'feed'
+import { escape } from '@std/html'
 
 const RSS = 'https://www.jiqizhixin.com/rss'
 
@@ -28,8 +29,8 @@ app.get('/rss/jiqizhixin.com', async (ctx) => {
       link: item.link,
       title: item.title,
       guid: item.guid,
-      description: item.description.slice('<![CDATA['.length, -']]>'.length),
-      content: item['content:encoded'].slice('<![CDATA['.length, -']]>'.length),
+      description: extractCDATA(item.description),
+      content: extractCDATA(item['content:encoded']),
     })
   }
 
@@ -40,6 +41,12 @@ app.get('/rss/jiqizhixin.com', async (ctx) => {
 
   return ctx.body(rss)
 })
+
+function extractCDATA(content: string) {
+  const s = content.slice('<![CDATA['.length, -']]>'.length)
+
+  return escape(s)
+}
 
 // ----------- types
 interface RSSResponse {
