@@ -1,4 +1,6 @@
-import './jiqizhixin.com.ts'
+import { Hono } from 'hono'
+import { app as rssRouter } from './rss/index.ts'
 
+export const app = new Hono()
 
-export { app } from './_app.ts'
+app.route('/rss', rssRouter)

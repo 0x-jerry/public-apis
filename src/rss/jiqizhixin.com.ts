@@ -1,11 +1,11 @@
-import { app } from './_app.ts'
-import { get } from './_utils.ts'
+import { app } from '../rss/_app.ts'
+import { get } from '../rss/_utils.ts'
 import { parse } from '@libs/xml'
 import { Feed } from 'feed'
 
 const RSS = 'https://www.jiqizhixin.com/rss'
 
-app.get('/rss/jiqizhixin.com', async (ctx) => {
+app.get('/jiqizhixin.com', async (ctx) => {
   const content = await get(RSS)
 
   const xml = parse(content) as unknown as RSSResponse
