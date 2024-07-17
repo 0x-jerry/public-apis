@@ -1,13 +1,8 @@
-import { Router } from 'oak'
-import { initWasm, Resvg } from 'https://cdn.skypack.dev/@resvg/resvg-wasm'
+import { initWasm, Resvg } from '@resvg/resvg-wasm'
+import { app } from './_app.ts'
 
-export const router = new Router()
-
-router.post('/png', async (ctx) => {
-  const body = ctx.request.body()
-
-  const data =
-    body.type === 'text' ? JSON.parse(await body.value) : await body.value
+app.post('/png', async (ctx) => {
+  const data = await ctx.req.json()
 
   const { svg, url } = data
 
@@ -15,20 +10,9 @@ router.post('/png', async (ctx) => {
 
   const buf = await svgToPng(svgData)
 
-  ctx.response.headers.set('Content-Type', 'image/png')
-  ctx.response.body = buf
-})
+  ctx.header('content-type', 'image/png')
 
-router.get('/png', async (ctx) => {
-  const params = ctx.request.url.searchParams
-  const url = params.get('url')!
-
-  const svgData = await getSvg(url)
-
-  const buf = await svgToPng(svgData)
-
-  ctx.response.headers.set('Content-Type', 'image/png')
-  ctx.response.body = buf
+  return ctx.body(buf)
 })
 
 async function getSvg(url: string) {

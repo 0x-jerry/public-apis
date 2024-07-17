@@ -1,19 +1,12 @@
-import { Hono } from 'hono'
+import { app } from './_app.ts'
+import './_index.tsx'
+
 import { app as rssRouter } from './rss/index.ts'
 import { app as qrRouter } from './qr/index.ts'
-
-export const app = new Hono()
-
-app.use(async (ctx, next) => {
-  await next()
-
-  if (ctx.error) {
-    ctx.status(400)
-    ctx.res = ctx.json({
-      message: String(ctx.error),
-    })
-  }
-})
+import { app as svgRouter } from './svg/index.ts'
 
 app.route('/rss', rssRouter)
 app.route('/qr', qrRouter)
+app.route('/svg', svgRouter)
+
+export { app }
