@@ -2,7 +2,6 @@ import { app } from './_app.ts'
 import { get } from './_utils.ts'
 import { parse } from '@libs/xml'
 import { Feed } from 'feed'
-import { escape } from '@std/html'
 
 const RSS = 'https://www.jiqizhixin.com/rss'
 
@@ -43,9 +42,14 @@ app.get('/rss/jiqizhixin.com', async (ctx) => {
 })
 
 function extractCDATA(content: string) {
-  const s = content.slice('<![CDATA['.length, -']]>'.length)
+  const cdataStart = '<![CDATA['
+  const cdataEnd = ']]>'
 
-  return escape(s)
+  if (content.startsWith(cdataStart) && content.endsWith(cdataEnd)) {
+    return content.slice(cdataStart.length, -cdataEnd.length)
+  } else {
+    return content
+  }
 }
 
 // ----------- types
