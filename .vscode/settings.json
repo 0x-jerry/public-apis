@@ -1,4 +1,7 @@
 {
+  "deno.enablePaths": [
+    "./"
+  ],
   "deno.enable": true,
-  "editor.formatOnSave": true
+  "editor.inlayHints.enabled": "off"
 }

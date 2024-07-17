@@ -1,2 +1,4 @@
-import 'https://deno.land/x/xhr@0.1.2/mod.ts'
-import './api.ts'
+import './jiqizhixin.com.ts'
+
+
+export { app } from './_app.ts'
