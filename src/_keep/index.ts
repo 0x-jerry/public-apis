@@ -1,6 +1,6 @@
 import { Router } from 'oak'
 import { htmlString } from './intro.tsx'
-import { router as qrRouter } from './qr.ts'
+import { router as qrRouter } from '../qr/generate.ts'
 import { router as transformRouter } from './transform.ts'
 import { router as previewRouter } from './preview.ts'
 import { router as svgRouter } from './svg.ts'
