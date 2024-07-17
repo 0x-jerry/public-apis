@@ -34,6 +34,10 @@ app.get('/rss/jiqizhixin.com', async (ctx) => {
   }
 
   const rss = feed.rss2()
+
+  ctx.header('content-type', 'text/xml')
+  ctx.header('charset', 'utf-8')
+
   return ctx.body(rss)
 })
 
