@@ -6,6 +6,8 @@ app.use(async (ctx, next) => {
   await next()
 
   if (ctx.error) {
+    console.error(ctx.error)
+
     ctx.status(400)
     ctx.res = ctx.json({
       message: String(ctx.error),
