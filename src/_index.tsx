@@ -38,12 +38,13 @@ function RenderMarkdownPage(props: { markdown: string }) {
   const md = render(props.markdown)
 
   return (
-    <Layout title="Some API">
-      <div data-color-mode="auto" data-dark-theme="auto" class="markdown-body">
+    <Layout title='Some API'>
+      <div data-color-mode='auto' data-dark-theme='auto' class='markdown-body'>
         <div
           style={{ width: '768px', margin: 'auto' }}
           dangerouslySetInnerHTML={{ __html: md }}
-        ></div>
+        >
+        </div>
       </div>
     </Layout>
   )
