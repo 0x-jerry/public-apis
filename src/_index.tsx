@@ -1,5 +1,4 @@
 import { render } from '@deno/gfm'
-import { html } from 'hono/html'
 import { app } from './_app.ts'
 
 app.get('/', async (ctx) => {
@@ -16,23 +15,25 @@ interface SiteData {
   children?: unknown
 }
 
-const Layout = (props: SiteData) =>
-  html`<!DOCTYPE html>
+function Layout(props: SiteData) {
+  return (
     <html>
       <head>
-        <title>${props.title}</title>
+        <title>{props.title}</title>
         <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.css"
+          rel='stylesheet'
+          href='https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.css'
         />
         <style>
-          ${props.style}
+          {props.style}
         </style>
       </head>
       <body>
-        ${props.children}
+        {props.children}
       </body>
-    </html>`
+    </html>
+  )
+}
 
 function RenderMarkdownPage(props: { markdown: string }) {
   const md = render(props.markdown)
@@ -43,8 +44,7 @@ function RenderMarkdownPage(props: { markdown: string }) {
         <div
           style={{ width: '768px', margin: 'auto' }}
           dangerouslySetInnerHTML={{ __html: md }}
-        >
-        </div>
+        />
       </div>
     </Layout>
   )
