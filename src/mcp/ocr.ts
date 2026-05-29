@@ -52,7 +52,7 @@ async function pollJob(jobId: string, token: string): Promise<string> {
       throw new Error(`Job failed: ${data.data.errorMsg}`)
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 5000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
   }
 }
 

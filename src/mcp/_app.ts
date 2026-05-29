@@ -13,13 +13,6 @@ const server = new McpServer({
 const transport = new WebStandardStreamableHTTPServerTransport()
 
 app.all('/', async (c) => {
-  const headers = c.req.header();
-  console.log('--- mcp request headers ---')
-  for (const [key, value] of Object.entries(headers)) {
-    console.log(`  ${key}: ${value}`)
-  }
-  console.log('--- end mcp request headers ---')
-  
   return transport.handleRequest(c.req.raw)
 })
 
