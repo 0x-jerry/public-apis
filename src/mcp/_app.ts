@@ -1,7 +1,9 @@
 import { createMcpHonoApp } from '@modelcontextprotocol/hono'
 import { McpServer, WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/server'
 
-const app = createMcpHonoApp()
+const app = createMcpHonoApp({
+  host: '0.0.0.0'
+})
 
 const server = new McpServer({
   name: 'public-apis',
