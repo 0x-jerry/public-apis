@@ -1,6 +1,6 @@
 import { app } from './_app.ts'
 import { get } from './_utils.ts'
-import { parse } from '@libs/xml'
+import { XMLParser } from 'fast-xml-parser'
 import { Feed } from 'feed'
 
 const RSS = 'https://www.jiqizhixin.com/rss'
@@ -8,7 +8,8 @@ const RSS = 'https://www.jiqizhixin.com/rss'
 app.get('/jiqizhixin.com', async (ctx) => {
   const content = await get(RSS)
 
-  const xml = parse(content) as unknown as RSSResponse
+  const parser = new XMLParser()
+  const xml = parser.parse(content) as unknown as RSSResponse
 
   const channel = xml.rss.channel
 

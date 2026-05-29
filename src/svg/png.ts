@@ -10,9 +10,9 @@ app.post('/png', async (ctx) => {
 
   const buf = await svgToPng(svgData)
 
-  ctx.header('content-type', 'image/png')
-
-  return ctx.body(buf)
+  return new Response(buf, {
+    headers: { 'content-type': 'image/png' },
+  })
 })
 
 async function getSvg(url: string) {
@@ -22,10 +22,8 @@ async function getSvg(url: string) {
 }
 
 async function svgToPng(svg: string) {
-  // deno-lint-ignore ban-ts-comment
   // @ts-ignore
   if (!svgToPng.inited) {
-    // deno-lint-ignore ban-ts-comment
     // @ts-ignore
     svgToPng.inited = true
     await initWasm(fetch('https://unpkg.com/@resvg/resvg-wasm/index_bg.wasm'))

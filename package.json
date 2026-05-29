@@ -1,0 +1,33 @@
+{
+  "name": "public-apis",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tsx main.ts",
+    "start": "tsx main.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.4",
+    "@resvg/resvg-wasm": "^2.6.2",
+    "cheerio": "^1.2.0",
+    "dayjs": "^1.11.21",
+    "fast-xml-parser": "^5.8.0",
+    "feed": "^5.2.1",
+    "hono": "^4.12.23",
+    "imagescript": "^1.3.1",
+    "jsqr": "^1.4.0",
+    "link-preview-js": "^4.0.3",
+    "marked": "^18.0.4",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@types/qrcode": "^1.5.6",
+    "tsx": "^4.22.3"
+  },
+  "peerDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

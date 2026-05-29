@@ -9,11 +9,11 @@ app.post('/scan', async (ctx) => {
     throw Error('Not found file')
   }
 
-  const imgInfo = await decode(await file.arrayBuffer())
+  const imgInfo = await decode(new Uint8Array(await file.arrayBuffer()))
 
   const imgBuffer = (imgInfo as Image).bitmap || (imgInfo as GIF).at(0)?.bitmap
 
-  const code = jsqr.default(imgBuffer, imgInfo.width, imgInfo.height)
+  const code = jsqr(imgBuffer as Uint8ClampedArray, imgInfo.width, imgInfo.height)
 
   return ctx.json({
     version: code?.version,

@@ -1,8 +1,9 @@
-import { render } from '@deno/gfm'
+import { readFile } from 'node:fs/promises'
+import { marked } from 'marked'
 import { app } from './_app.ts'
 
 app.get('/', async (ctx) => {
-  const intro = await Deno.readTextFile('./readme.md')
+  const intro = await readFile('./readme.md', 'utf-8')
 
   const app = <RenderMarkdownPage markdown={intro}></RenderMarkdownPage>
 
@@ -36,7 +37,7 @@ function Layout(props: SiteData) {
 }
 
 function RenderMarkdownPage(props: { markdown: string }) {
-  const md = render(props.markdown)
+  const md = marked.parse(props.markdown) as string
 
   return (
     <Layout title='Some API'>
