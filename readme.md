@@ -155,6 +155,25 @@ Fetches a URL, extracts page metadata, and converts the HTML content to Markdown
 
 **Output:** `text` — Markdown with YAML frontmatter.
 
+##### `ocr`
+
+Extracts text and layout from a document/image using PaddleOCR. Provide a URL to the document/image file.
+
+**Input:**
+
+| Field | Type   | Description                          |
+|-------|--------|--------------------------------------|
+| `url` | string | URL of the document/image to OCR     |
+
+**Output:** `text` — Extracted Markdown text.
+
+**Headers:**
+
+| Header        | Description                          |
+|---------------|--------------------------------------|
+| `x-ocr-token` | API authentication token (required)  |
+| `x-ocr-model` | Model name (default: `PaddleOCR-VL-1.6`) |
+
 ---
 
 ### SVG to PNG
@@ -222,6 +241,7 @@ src/
   ├── mcp/
   │   ├── _app.ts           # MCP Hono app + server + transport
   │   ├── html-to-markdown.ts # MCP tool: html-to-markdown
+  │   ├── ocr.ts            # MCP tool: ocr
   │   └── index.ts          # Router aggregator
 ├── qr/
 │   ├── _app.ts           # Sub-app for /qr routes
