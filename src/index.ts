@@ -4,9 +4,11 @@ import './_index.tsx'
 import { app as rssRouter } from './rss/index.ts'
 import { app as qrRouter } from './qr/index.ts'
 import { app as svgRouter } from './svg/index.ts'
+import { app as htmlRouter } from './html/index.ts'
 
 app.route('/rss', rssRouter)
 app.route('/qr', qrRouter)
 app.route('/svg', svgRouter)
+app.route('/html', htmlRouter)
 
 export { app }
