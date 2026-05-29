@@ -9,10 +9,9 @@ const server = new McpServer({
 })
 
 const transport = new WebStandardStreamableHTTPServerTransport()
-await server.connect(transport)
 
 app.all('/', async (c) => {
   return transport.handleRequest(c.req.raw)
 })
 
-export { app, server }
+export { app, server, transport }
