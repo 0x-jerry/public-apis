@@ -120,6 +120,43 @@ Page content converted to Markdown...
 
 ---
 
+### MCP Server
+
+This project exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server using the [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http) transport.
+
+The MCP endpoint is available at `https://public-apis.0x-jerry.deno.net/mcp`.
+
+#### Usage with Claude Desktop / MCP Clients
+
+Add to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "public-apis": {
+      "type": "streamableHttp",
+      "url": "https://public-apis.0x-jerry.deno.net/mcp"
+    }
+  }
+}
+```
+
+#### Tools
+
+##### `html-to-markdown`
+
+Fetches a URL, extracts page metadata, and converts the HTML content to Markdown with YAML frontmatter. Behaves identically to the [GET /html/to-markdown](#html-to-markdown) endpoint.
+
+**Input:**
+
+| Field | Type   | Description                    |
+|-------|--------|--------------------------------|
+| `url` | string | URL of the webpage to convert  |
+
+**Output:** `text` — Markdown with YAML frontmatter.
+
+---
+
 ### SVG to PNG
 
 #### Convert SVG to PNG
@@ -173,14 +210,19 @@ src/
 ├── _app.ts              # Main Hono app instance with error handling
 ├── _index.tsx            # Homepage route (renders readme.md)
 ├── index.ts              # Root router aggregator
-├── html/
-│   ├── _app.ts           # Sub-app for /html routes
-│   ├── to-markdown.ts    # GET /html/to-markdown
-│   └── index.ts          # Router aggregator
-├── link/
-│   ├── _app.ts           # Sub-app for /link routes
-│   ├── metadata.ts       # GET /link/metadata
-│   └── index.ts          # Router aggregator
+  ├── html/
+  │   ├── _app.ts           # Sub-app for /html routes
+  │   ├── convert.ts         # Shared HTML-to-Markdown conversion logic
+  │   ├── to-markdown.ts    # GET /html/to-markdown
+  │   └── index.ts          # Router aggregator
+  ├── link/
+  │   ├── _app.ts           # Sub-app for /link routes
+  │   ├── metadata.ts       # GET /link/metadata
+  │   └── index.ts          # Router aggregator
+  ├── mcp/
+  │   ├── _app.ts           # MCP Hono app + server + transport
+  │   ├── html-to-markdown.ts # MCP tool: html-to-markdown
+  │   └── index.ts          # Router aggregator
 ├── qr/
 │   ├── _app.ts           # Sub-app for /qr routes
 │   ├── generate.ts       # GET /qr/generate
