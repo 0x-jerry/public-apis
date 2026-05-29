@@ -65,9 +65,16 @@ server.registerTool(
   },
   async ({ url }, ctx) => {
     const req = ctx?.http?.req
+    if (req?.headers) {
+      console.log('--- ocr request headers ---')
+      for (const [key, value] of req.headers.entries()) {
+        console.log(`  ${key}: ${value}`)
+      }
+      console.log('--- end ocr request headers ---')
+    }
     const token = req?.headers?.get('x-ocr-token')
     if (!token) {
-      throw new Error('Missing OCR_TOKEN header')
+      throw new Error('Missing x-ocr-token header')
     }
     const model = req?.headers?.get('x-ocr-model') || DEFAULT_MODEL
 
