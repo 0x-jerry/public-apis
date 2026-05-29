@@ -27,6 +27,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cfworker/json-schema": "^4.1.1",
     "@types/node": "^25.9.1",
     "@types/qrcode": "^1.5.6",
     "@types/turndown": "^5.0.0",
