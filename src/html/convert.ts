@@ -1,12 +1,21 @@
 import { load } from 'cheerio'
 import TurndownService from 'turndown'
-import puppeteer from 'puppeteer-core'
+import puppeteer, { type Browser } from 'puppeteer-core'
+
+let browserPromise: Promise<Browser> | null = null
+
+function getBrowser(): Promise<Browser> {
+  if (!browserPromise) {
+    const wsEndpoint = process.env.BROWSER_WS || 'ws://127.0.0.1:9222'
+    browserPromise = puppeteer.connect({ browserWSEndpoint: wsEndpoint })
+  }
+  return browserPromise
+}
 
 export async function fetchHtml(url: string) {
   const enabled = process.env.BROWSER_WS_ENABLED === 'true' || process.env.BROWSER_WS_ENABLED === '1'
   if (enabled) {
-    const wsEndpoint = process.env.BROWSER_WS || 'ws://127.0.0.1:9222'
-    const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
+    const browser = await getBrowser()
     const page = await browser.newPage()
 
     try {
@@ -14,7 +23,6 @@ export async function fetchHtml(url: string) {
       return await page.content()
     } finally {
       await page.close()
-      await browser.disconnect()
     }
   }
 
