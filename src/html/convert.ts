@@ -1,6 +1,9 @@
 import { load } from 'cheerio'
 import TurndownService from 'turndown'
 import puppeteer, { type Browser } from 'puppeteer-core'
+import QuickLRU from 'quick-lru'
+
+const htmlCache = new QuickLRU<string, string>({ maxSize: 100, maxAge: 60_000 })
 
 let browserPromise: Promise<Browser> | null = null
 
@@ -13,23 +16,32 @@ function getBrowser(): Promise<Browser> {
 }
 
 export async function fetchHtml(url: string) {
+  const cached = htmlCache.get(url)
+  if (cached !== undefined) {
+    return cached
+  }
+
   const enabled = process.env.BROWSER_WS_ENABLED === 'true' || process.env.BROWSER_WS_ENABLED === '1'
+  let html: string
   if (enabled) {
     const browser = await getBrowser()
     const page = await browser.newPage()
 
     try {
       await page.goto(url, { waitUntil: 'networkidle0' })
-      return await page.content()
+      html = await page.content()
     } finally {
       await page.close()
     }
+  } else {
+    const resp = await fetch(url, {
+      headers: { Accept: 'text/html' },
+    })
+    html = await resp.text()
   }
 
-  const resp = await fetch(url, {
-    headers: { Accept: 'text/html' },
-  })
-  return await resp.text()
+  htmlCache.set(url, html)
+  return html
 }
 
 export async function htmlToMarkdown(url: string, limit = 50000) {
