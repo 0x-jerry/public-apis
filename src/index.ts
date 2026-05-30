@@ -7,8 +7,10 @@ import { app as svgRouter } from './svg/index.ts'
 import { app as htmlRouter } from './html/index.ts'
 import { app as imgToAsciiRouter } from './img-to-ascii/index.ts'
 import { app as mcpRouter } from './mcp/index.ts'
+import { trimTrailingSlash } from 'hono/trailing-slash'
 
 app.use(logger())
+app.use(trimTrailingSlash())
 
 app.use(async (ctx, next) => {
   await next()
