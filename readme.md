@@ -204,6 +204,23 @@ Converts a remote image to ASCII art. Behaves identically to the [GET /img-to-as
 
 **Output:** `text` — ASCII art string.
 
+##### `search`
+
+Search the web using Bing or DuckDuckGo.
+
+**Input:**
+
+| Field    | Type   | Default       | Description                                            |
+|----------|--------|---------------|--------------------------------------------------------|
+| `q`      | string | —             | Search query                                           |
+| `engine` | string | `duckduckgo`  | Search engine: `bing` or `duckduckgo`                  |
+
+**Output:** `text` — Search results as Markdown with pagination links.
+
+> The `bing` engine requires a headless Chrome browser (BROWSER_WS_ENABLED=true). DuckDuckGo uses `fetch` and works without a browser.
+
+---
+
 ##### `ocr`
 
 Extracts text and layout from a document/image using PaddleOCR. Provide a URL to the document/image file.
