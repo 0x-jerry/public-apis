@@ -90,16 +90,17 @@ Fetches metadata (title, description, image, etc.) for any URL.
 
 #### Convert HTML to Markdown
 ```
-GET /html/to-markdown?url=<url>
+GET /html/to-markdown?url=<url>&limit=<limit>
 ```
 
 Fetches a URL, strips CSS/JS, and converts the HTML content to Markdown with a YAML frontmatter block containing page metadata.
 
 **Query Parameters:**
 
-| Param | Type   | Description         |
-|-------|--------|---------------------|
-| `url` | string | URL to convert      |
+| Param   | Type   | Default | Description                                |
+|---------|--------|---------|--------------------------------------------|
+| `url`   | string | —       | URL to convert                             |
+| `limit` | number | 50000   | Maximum character length of the output     |
 
 **Response:** `text/plain` — Markdown with YAML frontmatter.
 
@@ -149,9 +150,10 @@ Fetches a URL, extracts page metadata, and converts the HTML content to Markdown
 
 **Input:**
 
-| Field | Type   | Description                    |
-|-------|--------|--------------------------------|
-| `url` | string | URL of the webpage to convert  |
+| Field   | Type   | Default | Description                                    |
+|---------|--------|---------|------------------------------------------------|
+| `url`   | string | —       | URL of the webpage to convert                  |
+| `limit` | number | 50000   | Maximum character length of the output         |
 
 **Output:** `text` — Markdown with YAML frontmatter.
 

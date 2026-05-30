@@ -1,7 +1,7 @@
 import { load } from 'cheerio'
 import TurndownService from 'turndown'
 
-export async function htmlToMarkdown(url: string) {
+export async function htmlToMarkdown(url: string, limit = 50000) {
   const raw = await (await fetch(url)).text()
 
   const $ = load(raw)
@@ -33,5 +33,11 @@ export async function htmlToMarkdown(url: string) {
   const turndown = new TurndownService()
   const markdown = turndown.turndown($.html())
 
-  return yaml + '\n' + markdown
+  let result = yaml + '\n' + markdown
+
+  if (result.length > limit) {
+    result = result.slice(0, limit) + '\n\n... (truncated)'
+  }
+
+  return result
 }
