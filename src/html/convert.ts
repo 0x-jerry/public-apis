@@ -10,7 +10,7 @@ export async function fetchHtml(url: string) {
     const page = await browser.newPage()
 
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded' })
+      await page.goto(url, { waitUntil: 'networkidle0' })
       return await page.content()
     } finally {
       await page.close()

@@ -15,3 +15,14 @@ services:
             - info
             - --user-agent-suffix
             - 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
+
+    app:
+        build: .
+        restart: unless-stopped
+        ports:
+            - '3000:3000'
+        environment:
+            BROWSER_WS_ENABLED: 'true'
+            BROWSER_WS: 'ws://lightpanda:9222'
+        depends_on:
+            - lightpanda
