@@ -121,6 +121,31 @@ Page content converted to Markdown...
 
 ---
 
+### Image to ASCII
+
+#### Convert Image to ASCII Art
+```
+GET /img-to-ascii/convert?url=<url>&maxSize=<maxSize>
+```
+
+Fetches a remote image and converts it to ASCII art.
+
+**Query Parameters:**
+
+| Param     | Type   | Default | Description                                      |
+|-----------|--------|---------|--------------------------------------------------|
+| `url`     | string | —       | URL of the image to convert                      |
+| `maxSize` | number | 80      | Maximum width/height in characters               |
+
+**Response:** `text/plain`
+
+**Example:**
+```
+GET /img-to-ascii/convert?url=https://example.com/image.png&maxSize=60
+```
+
+---
+
 ### MCP Server
 
 This project exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server using the [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http) transport.
@@ -156,6 +181,19 @@ Fetches a URL, extracts page metadata, and converts the HTML content to Markdown
 | `limit` | number | 50000   | Maximum character length of the output         |
 
 **Output:** `text` — Markdown with YAML frontmatter.
+
+##### `img-to-ascii`
+
+Converts a remote image to ASCII art. Behaves identically to the [GET /img-to-ascii/convert](#image-to-ascii) endpoint.
+
+**Input:**
+
+| Field     | Type   | Default | Description                                      |
+|-----------|--------|---------|--------------------------------------------------|
+| `url`     | string | —       | URL of the image to convert                      |
+| `maxSize` | number | 80      | Maximum width/height in characters               |
+
+**Output:** `text` — ASCII art string.
 
 ##### `ocr`
 
@@ -231,10 +269,17 @@ src/
 ├── _app.ts              # Main Hono app instance with error handling
 ├── _index.tsx            # Homepage route (renders readme.md)
 ├── index.ts              # Root router aggregator
+├── _libs/
+│   └── img-to-ascii/
+│       └── index.ts       # Shared imgToAscii() utility
   ├── html/
   │   ├── _app.ts           # Sub-app for /html routes
   │   ├── convert.ts         # Shared HTML-to-Markdown conversion logic
   │   ├── to-markdown.ts    # GET /html/to-markdown
+  │   └── index.ts          # Router aggregator
+  ├── img-to-ascii/
+  │   ├── _app.ts           # Sub-app for /img-to-ascii routes
+  │   ├── convert.ts        # GET /img-to-ascii/convert
   │   └── index.ts          # Router aggregator
   ├── link/
   │   ├── _app.ts           # Sub-app for /link routes
@@ -243,6 +288,7 @@ src/
   ├── mcp/
   │   ├── _app.ts           # MCP Hono app + server + transport
   │   ├── html-to-markdown.ts # MCP tool: html-to-markdown
+  │   ├── img-to-ascii.ts   # MCP tool: img-to-ascii
   │   ├── ocr.ts            # MCP tool: ocr
   │   └── index.ts          # Router aggregator
 ├── qr/
