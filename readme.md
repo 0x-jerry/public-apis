@@ -21,7 +21,9 @@ The server starts at `http://localhost:3000`.
 
 | Variable            | Default                 | Description                                       |
 |--------------------|-------------------------|---------------------------------------------------|
-| `BROWSER_WS`        | `ws://127.0.0.1:9222`   | Chrome DevTools WebSocket endpoint for Puppeteer   |
+| `AUTH_ENABLED`       | —                       | Set to `true` or `1` to require authentication     |
+| `AUTH_TOKEN`         | —                       | Bearer token required when auth is enabled          |
+| `BROWSER_WS`         | `ws://127.0.0.1:9222`   | Chrome DevTools WebSocket endpoint for Puppeteer   |
 | `BROWSER_WS_ENABLED` | —                       | Set to `true` or `1` to use headless browser; falls back to plain fetch otherwise |
 
 ## API Reference

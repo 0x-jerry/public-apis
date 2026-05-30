@@ -1,6 +1,9 @@
 import { Hono } from 'hono'
+import { auth } from './_auth.ts'
 
 export const app = new Hono()
+
+app.use(auth)
 
 app.use(async (ctx, next) => {
   const start = Date.now()
