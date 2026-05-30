@@ -1,4 +1,5 @@
 import puppeteer, { type Browser } from 'puppeteer-core'
+import { sleep } from '@0x-jerry/utils'
 
 let browserPromise: Promise<Browser> | null = null
 
@@ -24,7 +25,11 @@ export async function fetchHtmlWithBrowser(url: string): Promise<string | null> 
 
   const page = await browser.newPage()
   try {
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30_000 })
+    await Promise.race([
+      page.goto(url, { waitUntil: 'networkidle0' }),
+      sleep(20_000)
+    ])
+    
     return await page.content()
   } finally {
     await page.close()
