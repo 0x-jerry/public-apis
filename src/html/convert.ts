@@ -28,7 +28,7 @@ export async function fetchHtml(url: string) {
     const page = await browser.newPage()
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle0' })
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30_000 })
       html = await page.content()
     } finally {
       await page.close()
