@@ -1,6 +1,7 @@
 import puppeteer, { type Browser } from 'puppeteer-core'
 import { sleep } from '@0x-jerry/utils'
 
+let browser: Browser | null = null
 let browserPromise: Promise<Browser> | null = null
 
 function isBrowserEnabled() {
@@ -8,13 +9,27 @@ function isBrowserEnabled() {
   return v === 'true' || v === '1'
 }
 
-export function getBrowser(): Promise<Browser> | null {
+export function getBrowser(): Promise<Browser> | Browser | null {
   if (!isBrowserEnabled()) {
     return null
   }
+  if (browser?.connected) {
+    return browser
+  }
+  browser = null
   if (!browserPromise) {
     const wsEndpoint = process.env.BROWSER_WS || 'ws://127.0.0.1:9222'
-    browserPromise = puppeteer.connect({ browserWSEndpoint: wsEndpoint })
+    browserPromise = puppeteer
+      .connect({ browserWSEndpoint: wsEndpoint })
+      .then((b) => {
+        browser = b
+        browserPromise = null
+        return b
+      })
+      .catch((e) => {
+        browserPromise = null
+        throw e
+      })
   }
   return browserPromise
 }
