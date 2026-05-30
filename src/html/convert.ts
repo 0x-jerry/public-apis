@@ -2,7 +2,10 @@ import { load } from 'cheerio'
 import TurndownService from 'turndown'
 
 export async function htmlToMarkdown(url: string, limit = 50000) {
-  const raw = await (await fetch(url)).text()
+  const resp = await fetch(url, {
+    headers: { Accept: 'text/html' },
+  })
+  const raw = await resp.text()
 
   const $ = load(raw)
 
