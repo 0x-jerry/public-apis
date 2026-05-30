@@ -159,7 +159,7 @@ GET /img-to-ascii/convert?url=https://example.com/image.png&maxSize=60
 
 This project exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server using the [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http) transport.
 
-The MCP endpoint is available at `https://public-apis.0x-jerry.deno.net/mcp`.
+The MCP endpoint is available at `http://localhost:3000/mcp`.
 
 #### Usage with Claude Desktop / MCP Clients
 
@@ -170,7 +170,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "public-apis": {
       "type": "streamableHttp",
-      "url": "https://public-apis.0x-jerry.deno.net/mcp"
+      "url": "http://localhost:3000/mcp"
     }
   }
 }
