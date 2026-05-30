@@ -1,11 +1,31 @@
 import { load } from 'cheerio'
 import TurndownService from 'turndown'
+import puppeteer from 'puppeteer-core'
 
-export async function htmlToMarkdown(url: string, limit = 50000) {
+export async function fetchHtml(url: string) {
+  const enabled = process.env.BROWSER_WS_ENABLED === 'true' || process.env.BROWSER_WS_ENABLED === '1'
+  if (enabled) {
+    const wsEndpoint = process.env.BROWSER_WS || 'ws://127.0.0.1:9222'
+    const browser = await puppeteer.connect({ browserWSEndpoint: wsEndpoint })
+    const page = await browser.newPage()
+
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded' })
+      return await page.content()
+    } finally {
+      await page.close()
+      await browser.disconnect()
+    }
+  }
+
   const resp = await fetch(url, {
     headers: { Accept: 'text/html' },
   })
-  const raw = await resp.text()
+  return await resp.text()
+}
+
+export async function htmlToMarkdown(url: string, limit = 50000) {
+  const raw = await fetchHtml(url)
 
   const $ = load(raw)
 

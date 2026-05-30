@@ -17,6 +17,13 @@ bun check
 
 The server starts at `http://localhost:3000`.
 
+## Environment Variables
+
+| Variable            | Default                 | Description                                       |
+|--------------------|-------------------------|---------------------------------------------------|
+| `BROWSER_WS`        | `ws://127.0.0.1:9222`   | Chrome DevTools WebSocket endpoint for Puppeteer   |
+| `BROWSER_WS_ENABLED` | —                       | Set to `true` or `1` to use headless browser; falls back to plain fetch otherwise |
+
 ## API Reference
 
 ### QR Code
@@ -93,7 +100,7 @@ Fetches metadata (title, description, image, etc.) for any URL.
 GET /html/to-markdown?url=<url>&limit=<limit>
 ```
 
-Fetches a URL, strips CSS/JS, and converts the HTML content to Markdown with a YAML frontmatter block containing page metadata.
+Fetches a URL using a headless Chrome browser (via Puppeteer), strips CSS/JS, and converts the rendered HTML content to Markdown with a YAML frontmatter block containing page metadata. Requires a Chrome/Chromium instance with remote debugging enabled on `BROWSER_WS`.
 
 **Query Parameters:**
 
@@ -171,7 +178,7 @@ Add to your MCP client configuration:
 
 ##### `html-to-markdown`
 
-Fetches a URL, extracts page metadata, and converts the HTML content to Markdown with YAML frontmatter. Behaves identically to the [GET /html/to-markdown](#html-to-markdown) endpoint.
+Fetches a URL using a headless Chrome browser (via Puppeteer), extracts page metadata, and converts the HTML content to Markdown with YAML frontmatter. Behaves identically to the [GET /html/to-markdown](#html-to-markdown) endpoint.
 
 **Input:**
 
