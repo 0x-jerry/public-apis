@@ -10,7 +10,7 @@ app.post('/png', async (ctx) => {
 
   const buf = await svgToPng(svgData)
 
-  return new Response(buf, {
+  return new Response(Uint8Array.from(buf), {
     headers: { 'content-type': 'image/png' },
   })
 })
