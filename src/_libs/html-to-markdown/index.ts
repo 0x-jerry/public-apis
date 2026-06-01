@@ -28,7 +28,10 @@ export function htmlToMarkdown(html: string, url?: string, limit = 50000) {
 
   $('style, script, link, meta, head').remove()
 
-  const turndown = new TurndownService()
+  const turndown = new TurndownService({
+    codeBlockStyle: 'fenced',
+  })
+  
   const markdown = turndown.turndown($.html())
 
   let result = yaml + '\n' + markdown
