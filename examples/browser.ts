@@ -8,7 +8,7 @@ if (!browser) {
 
 const page = await browser.newPage();
 
-const url = "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Design_and_accessibility/HTML_features_for_accessibility";
+const url = "https://news.ycombinator.com/news";
 await page.goto(url, { waitUntil: "networkidle0" });
 
 const content = await page.content();

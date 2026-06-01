@@ -1,44 +1,58 @@
-import { load } from 'cheerio'
-import TurndownService from 'turndown'
+import TurndownService from "turndown";
+import { Readability } from "@mozilla/readability";
+import { JSDOM } from "jsdom";
+
+const turndown = new TurndownService({
+  headingStyle: "atx",
+  codeBlockStyle: "fenced",
+});
 
 export function htmlToMarkdown(html: string, url?: string, limit = 50000) {
-  const $ = load(html)
+  const dom = new JSDOM(html);
+  const doc = dom.window.document;
 
-  const metadata = {
-    url: url ?? '',
-    title: $('title').text().trim(),
-    description: $('meta[name="description"]').attr('content') || '',
-    ogTitle: $('meta[property="og:title"]').attr('content') || '',
-    ogDescription: $('meta[property="og:description"]').attr('content') || '',
-    ogImage: $('meta[property="og:image"]').attr('content') || '',
-    language: $('html').attr('lang') || '',
-  }
+  const yaml = extractMetadata(url, doc);
 
-  const yaml = [
-    '---',
-    `url: "${metadata.url}"`,
-    `title: "${metadata.title}"`,
-    metadata.description ? `description: "${metadata.description}"` : '',
-    metadata.ogTitle ? `og:title: "${metadata.ogTitle}"` : '',
-    metadata.ogDescription ? `og:description: "${metadata.ogDescription}"` : '',
-    metadata.ogImage ? `og:image: "${metadata.ogImage}"` : '',
-    metadata.language ? `language: "${metadata.language}"` : '',
-    '---',
-  ].filter(Boolean).join('\n')
+  const article = new Readability(doc).parse();
 
-  $('style, script, link, meta, head').remove()
+  const markdown = turndown.turndown(article?.content || doc.body?.innerHTML || "");
 
-  const turndown = new TurndownService({
-    codeBlockStyle: 'fenced',
-  })
-  
-  const markdown = turndown.turndown($.html())
-
-  let result = yaml + '\n' + markdown
+  let result = yaml + "\n" + markdown;
 
   if (result.length > limit) {
-    result = result.slice(0, limit) + '\n\n... (truncated)'
+    result = result.slice(0, limit) + "\n\n... (truncated)";
   }
 
-  return result
+  return result;
+}
+
+function extractMetadata(url: string | undefined, doc: Document) {
+  const getMetaContent = (attr: string, value: string) =>
+    doc.querySelector(`meta[${attr}="${value}"]`)?.getAttribute("content") || "";
+
+  const metadata = {
+    url: url ?? "",
+    title: doc.querySelector("title")?.textContent?.trim() || "",
+    description: getMetaContent('name', 'description'),
+    ogTitle: getMetaContent('property', 'og:title'),
+    ogDescription: getMetaContent('property', 'og:description'),
+    ogImage: getMetaContent('property', 'og:image'),
+    language: doc.documentElement?.getAttribute("lang") || "",
+  };
+
+  const yaml = [
+    "---",
+    `url: "${metadata.url}"`,
+    `title: "${metadata.title}"`,
+    metadata.description ? `description: "${metadata.description}"` : "",
+    metadata.ogTitle ? `og:title: "${metadata.ogTitle}"` : "",
+    metadata.ogDescription ? `og:description: "${metadata.ogDescription}"` : "",
+    metadata.ogImage ? `og:image: "${metadata.ogImage}"` : "",
+    metadata.language ? `language: "${metadata.language}"` : "",
+    "---",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return yaml;
 }
