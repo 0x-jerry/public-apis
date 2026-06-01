@@ -1,5 +1,6 @@
 import { getBrowser } from "../src/_libs/browser";
 import { htmlToMarkdown } from "../src/_libs/html-to-markdown";
+import { sleep } from "@0x-jerry/utils";
 
 const browser = await getBrowser();
 if (!browser) {
