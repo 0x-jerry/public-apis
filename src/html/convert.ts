@@ -1,6 +1,6 @@
 import QuickLRU from 'quick-lru'
 import { fetchHtmlWithBrowser } from '../_libs/browser/index.ts'
-import { htmlToMarkdown as convertToMarkdown } from '../_libs/html-to-markdown/index.ts'
+import { htmlToMarkdown as convertToMarkdown, HtmlToMarkdownOptions } from '../_libs/html-to-markdown/index.ts'
 
 const htmlCache = new QuickLRU<string, string>({ maxSize: 100, maxAge: 60_000 })
 
@@ -23,7 +23,7 @@ async function fetchHtml(url: string) {
   return html
 }
 
-export async function htmlToMarkdown(url: string, limit = 50000) {
+export async function htmlToMarkdown(url: string, options?: Omit<HtmlToMarkdownOptions, 'url'>) {
   const raw = await fetchHtml(url)
-  return convertToMarkdown(raw, url, limit)
+  return convertToMarkdown(raw, { url, ...options })
 }
