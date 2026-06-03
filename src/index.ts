@@ -6,6 +6,7 @@ import { app as qrRouter } from './qr/index.ts'
 import { app as svgRouter } from './svg/index.ts'
 import { app as htmlRouter } from './html/index.ts'
 import { app as imgToAsciiRouter } from './img-to-ascii/index.ts'
+import { app as linkRouter } from './link/index.ts'
 import { app as mcpRouter } from './mcp/index.ts'
 import { app as uploadRouter } from './upload/index.ts'
 import { trimTrailingSlash } from 'hono/trailing-slash'
@@ -33,6 +34,7 @@ app.route('/svg', svgRouter)
 app.route('/html', htmlRouter)
 
 app.route('/img-to-ascii', imgToAsciiRouter)
+app.route('/link', linkRouter)
 
 // app.use('/mcp/*', auth)
 app.route('/mcp', mcpRouter)

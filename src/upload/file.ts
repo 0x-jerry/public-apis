@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { mkdir, readdir, stat, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { app } from './_app.ts'
 
@@ -8,7 +8,7 @@ const MAX_TOTAL = 2 * 1024 * 1024 * 1024
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000
 
 function storagePath() {
-  return process.env.STORAGE_PATH || join(process.cwd(), 'files')
+  return join(process.cwd(), process.env.STORAGE_PATH || 'files')
 }
 
 /**
@@ -75,4 +75,15 @@ app.post('/file', async (ctx) => {
     size: file.size,
     type: file.type,
   })
+})
+
+app.get('/file/:name', async (ctx) => {
+  const name = ctx.req.param('name')
+  const dir = storagePath()
+  const filePath = join(dir, name)
+  if (!filePath.startsWith(dir)) {
+    throw Error('Invalid file name')
+  }
+  const buffer = await readFile(filePath)
+  return new Response(buffer)
 })

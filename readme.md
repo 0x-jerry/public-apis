@@ -25,6 +25,7 @@ The server starts at `http://localhost:3000`.
 | `AUTH_TOKEN`         | —                       | Bearer token required when auth is enabled          |
 | `BROWSER_WS`         | `ws://127.0.0.1:9222`   | Chrome DevTools WebSocket endpoint for Puppeteer   |
 | `BROWSER_WS_ENABLED` | —                       | Set to `true` or `1` to use headless browser; falls back to plain fetch otherwise |
+| `STORAGE_PATH`       | `files`                 | Directory for uploaded files                        |
 
 ## API Reference
 
@@ -99,7 +100,7 @@ Fetches metadata (title, description, image, etc.) for any URL.
 
 #### Convert HTML to Markdown
 ```
-GET /html/to-markdown?url=<url>&limit=<limit>
+GET /html/to-markdown?url=<url>
 ```
 
 Fetches a URL using a headless Chrome browser (via Puppeteer), strips CSS/JS, and converts the rendered HTML content to Markdown with a YAML frontmatter block containing page metadata. Requires a Chrome/Chromium instance with remote debugging enabled on `BROWSER_WS`.
@@ -109,18 +110,14 @@ Fetches a URL using a headless Chrome browser (via Puppeteer), strips CSS/JS, an
 | Param   | Type   | Default | Description                                |
 |---------|--------|---------|--------------------------------------------|
 | `url`   | string | —       | URL to convert                             |
-| `limit` | number | 50000   | Maximum character length of the output     |
 
 **Response:** `text/plain` — Markdown with YAML frontmatter.
 
 **Example output:**
 ```markdown
 ---
-url: "https://example.com"
 title: "Example Page"
 description: "A description of the page"
-og:title: "Open Graph Title"
-language: "en"
 ---
 
 # Main Heading
@@ -180,14 +177,16 @@ Add to your MCP client configuration:
 
 ##### `html-to-markdown`
 
-Fetches a URL using a headless Chrome browser (via Puppeteer), extracts page metadata, and converts the HTML content to Markdown with YAML frontmatter. Behaves identically to the [GET /html/to-markdown](#html-to-markdown) endpoint.
+Fetches a URL using a headless Chrome browser (via Puppeteer), extracts page metadata, and converts the HTML content to Markdown with YAML frontmatter. Behaves similarly to the [GET /html/to-markdown](#html-to-markdown) endpoint.
 
 **Input:**
 
-| Field   | Type   | Default | Description                                    |
-|---------|--------|---------|------------------------------------------------|
-| `url`   | string | —       | URL of the webpage to convert                  |
-| `limit` | number | 50000   | Maximum character length of the output         |
+| Field   | Type   | Default  | Description                                    |
+|---------|--------|----------|------------------------------------------------|
+| `url`   | string | —        | URL of the webpage to convert                  |
+| `limit` | number | 50000    | Maximum character length of the output         |
+| `offset`| number | 0        | Character offset to start from                 |
+| `mode`  | string | `readable` | Extraction mode: `full` or `readable`          |
 
 **Output:** `text` — Markdown with YAML frontmatter.
 
@@ -227,9 +226,11 @@ Extracts text and layout from a document/image using PaddleOCR. Provide a URL to
 
 **Input:**
 
-| Field | Type   | Description                          |
-|-------|--------|--------------------------------------|
-| `url` | string | URL of the document/image to OCR     |
+| Field   | Type   | Default | Description                          |
+|---------|--------|---------|--------------------------------------|
+| `url`   | string | —       | URL of the document/image to OCR     |
+| `limit` | number | 50000   | Maximum character length of output   |
+| `offset`| number | 0       | Character offset to start from       |
 
 **Output:** `text` — Extracted Markdown text.
 
@@ -261,6 +262,60 @@ Converts an SVG to a PNG image.
 > Provide either `svg` or `url`.
 
 **Response:** `image/png`
+
+---
+
+### File Upload
+
+#### Upload Page
+```
+GET /upload
+```
+
+A web interface for uploading files with drag-and-drop support. Saves the auth token to localStorage.
+
+---
+
+#### Upload File
+```
+POST /upload/file
+```
+
+Upload a file. Requires authentication (`AUTH_ENABLED=true` and `AUTH_TOKEN` configured).
+
+**Headers:**
+
+| Header          | Description                    |
+|-----------------|--------------------------------|
+| `Authorization`  | `Bearer <token>` (required)    |
+
+**Request:** `multipart/form-data`
+
+| Field  | Type | Description                |
+|--------|------|----------------------------|
+| `file` | File | File to upload (max 100MB) |
+
+**Response:** `application/json`
+```json
+{
+  "name": "d41d8cd98f00b204e9800998ecf8427e.png",
+  "size": 1024,
+  "type": "image/png"
+}
+```
+
+Files are stored with an MD5 hash of their content as the filename. Files older than 7 days are automatically removed, and the oldest files are evicted when total storage exceeds 2GB.
+
+---
+
+#### Download File
+```
+GET /upload/file/:name
+```
+
+Download a previously uploaded file by name.
+
+**Response:** Raw file content with appropriate content type.
 
 ---
 
