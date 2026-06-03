@@ -11,9 +11,11 @@ server.registerTool(
       "Extract text and layout from a document/image using OCR. Provide a URL to the document/image file.",
     inputSchema: z.object({
       url: z.string().describe("URL of the document/image to OCR"),
+      offset: z.number().optional().default(0).describe('Character index to start output from (default: 0)'),
+      limit: z.number().optional().default(50000).describe('Maximum character length of the output (default: 50000)'),
     }),
   },
-  async ({ url }, ctx) => {
+  async ({ url, offset, limit }, ctx) => {
     const req = ctx?.http?.req
     const token = req?.headers?.get("x-ocr-token")
 
@@ -27,7 +29,7 @@ server.registerTool(
 
     const pages = results.flatMap((item) => item.result.layoutParsingResults)
 
-    const markdownText = pages
+    const full = pages
       .map((page: LayoutParsingResult, idx: number) => {
         const { width, height, parsing_res_list } = page.prunedResult
 
@@ -44,6 +46,11 @@ server.registerTool(
         return pageHeader + blocks
       })
       .join("\n\n")
+
+    let markdownText = full.slice(offset, offset + limit)
+    if (full.length > offset + limit) {
+      markdownText += "\n\n... (truncated)"
+    }
 
     return {
       content: [{ type: "text" as const, text: markdownText }],

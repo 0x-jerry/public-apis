@@ -9,8 +9,6 @@ const turndown = new TurndownService({
 })
 
 export interface HtmlToMarkdownOptions {
-  /** Maximum output length in characters (default: 50000) */
-  limit?: number
   /** `"readable"` (default) extracts article content, `"full"` converts the entire body */
   mode?: "full" | "readable"
 }
@@ -23,15 +21,10 @@ export interface HtmlToMarkdownOptions {
  * In `full` mode, the entire HTML body is converted as-is.
  *
  * @param html - Raw HTML string to convert
- * @param options
- * @param options.url - Source URL, included in YAML front matter
- * @param options.limit - Maximum output length in characters (default: 50000)
- * @param options.mode - `"readable"` (default) extracts article content,
- *   `"full"` converts the entire body without filtering
  * @returns Markdown string prefixed with YAML front matter
  */
 export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
-  const { limit = 50000, mode = "readable" } = options ?? {}
+  const { mode = "readable" } = options ?? {}
 
   const dom = new JSDOM(html)
   const doc = dom.window.document
@@ -45,11 +38,7 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
     article = new Readability(doc).parse()?.content || article
   }
 
-  let markdown = turndown.turndown(article)
-
-  if (markdown.length > limit) {
-    markdown = markdown.slice(0, limit) + "\n\n... (truncated)"
-  }
+  const markdown = turndown.turndown(article)
 
   const metadataStr = `---\n${stringify(metadata, {})}---`
   return metadataStr + "\n" + markdown
