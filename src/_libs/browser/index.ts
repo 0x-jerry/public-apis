@@ -42,7 +42,7 @@ export async function fetchHtmlWithBrowser(url: string): Promise<string | null> 
   try {
     await Promise.race([
       page.goto(url, { waitUntil: 'networkidle0' }),
-      sleep(20_000)
+      sleep(10_000)
     ])
     
     return await page.content()
