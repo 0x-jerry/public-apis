@@ -1,59 +1,14 @@
 import * as z from 'zod'
 import { server } from './_app.ts'
+import { PaddleOCRClient } from '@paddleocr/api-sdk'
+import type { PaddleOCRVLOptions } from '@paddleocr/api-sdk'
 
-const JOB_URL = 'https://paddleocr.aistudio-app.com/api/v2/ocr/jobs'
 const DEFAULT_MODEL = 'PaddleOCR-VL-1.6'
 
-const OPTIONAL_PAYLOAD = {
+const DEFAULT_OPTIONS: PaddleOCRVLOptions = {
   useDocOrientationClassify: false,
   useDocUnwarping: false,
   useChartRecognition: false,
-}
-
-async function submitJob(
-  url: string,
-  token: string,
-  model: string,
-): Promise<string> {
-  const headers = { Authorization: `bearer ${token}` }
-
-  const resp = await fetch(JOB_URL, {
-    method: 'POST',
-    headers: { ...headers, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fileUrl: url,
-      model,
-      optionalPayload: OPTIONAL_PAYLOAD,
-    }),
-  })
-  if (!resp.ok) {
-    throw new Error(`Job submission failed: ${resp.status} ${await resp.text()}`)
-  }
-  const data = await resp.json() as any
-  return data.data.jobId
-}
-
-async function pollJob(jobId: string, token: string): Promise<string> {
-  const headers = { Authorization: `bearer ${token}` }
-
-  while (true) {
-    const resp = await fetch(`${JOB_URL}/${jobId}`, { headers })
-    if (!resp.ok) {
-      throw new Error(`Job status check failed: ${resp.status}`)
-    }
-    const data = await resp.json() as any
-    const state = data.data.state
-    console.log(`OCR job ${jobId} status: ${state}`)
-
-    if (state === 'done') {
-      return data.data.resultUrl.jsonUrl
-    }
-    if (state === 'failed') {
-      throw new Error(`Job failed: ${data.data.errorMsg}`)
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-  }
 }
 
 server.registerTool(
@@ -72,17 +27,19 @@ server.registerTool(
     }
     const model = req?.headers?.get('x-ocr-model') || DEFAULT_MODEL
 
-    const jobId = await submitJob(url, token, model)
-    const jsonlUrl = await pollJob(jobId, token)
+    const client = new PaddleOCRClient({ token })
+    const result = await client.parseDocument({
+      fileUrl: url,
+      model,
+      options: DEFAULT_OPTIONS,
+    })
 
-    const resp = await fetch(jsonlUrl)
-    if (!resp.ok) {
-      throw new Error(`Failed to fetch results: ${resp.status}`)
-    }
-    const text = await resp.text()
+    const markdownText = result.pages
+      .map((p) => p.markdownText)
+      .join('\n\n')
 
     return {
-      content: [{ type: 'text' as const, text }],
+      content: [{ type: 'text' as const, text: markdownText }],
     }
   },
 )

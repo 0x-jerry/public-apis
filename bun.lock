@@ -10,6 +10,7 @@
         "@modelcontextprotocol/hono": "^2.0.0-alpha.2",
         "@modelcontextprotocol/server": "^2.0.0-alpha.2",
         "@mozilla/readability": "^0.6.0",
+        "@paddleocr/api-sdk": "^0.1.0",
         "@resvg/resvg-wasm": "^2.6.2",
         "cheerio": "^1.2.0",
         "dayjs": "^1.11.21",
@@ -84,6 +85,8 @@
     "@mozilla/readability": ["@mozilla/readability@0.6.0", "https://registry.npmmirror.com/@mozilla/readability/-/readability-0.6.0.tgz", {}, "sha512-juG5VWh4qAivzTAeMzvY9xs9HY5rAcr2E4I7tiSSCokRFi7XIZCAu92ZkSTsIj1OPceCifL3cpfteP3pDT9/QQ=="],
 
     "@nodable/entities": ["@nodable/entities@2.1.0", "https://registry.npmmirror.com/@nodable/entities/-/entities-2.1.0.tgz", {}, "sha512-nyT7T3nbMyBI/lvr6L5TyWbFJAI9FTgVRakNoBqCD+PmID8DzFrrNdLLtHMwMszOtqZa8PAOV24ZqDnQrhQINA=="],
+
+    "@paddleocr/api-sdk": ["@paddleocr/api-sdk@0.1.0", "https://registry.npmmirror.com/@paddleocr/api-sdk/-/api-sdk-0.1.0.tgz", {}, "sha512-1/2KzDi2mee/mC11//wYO2eKvjrdprOMI17CCrwoUdDmHeFBlx3kAdxyts4CqxQjx8+i2aI1QnMfrSVeUqPdmA=="],
 
     "@puppeteer/browsers": ["@puppeteer/browsers@3.0.4", "https://registry.npmmirror.com/@puppeteer/browsers/-/browsers-3.0.4.tgz", { "dependencies": { "modern-tar": "^0.7.6", "yargs": "^17.7.2" }, "peerDependencies": { "proxy-agent": ">=8.0.1" }, "optionalPeers": ["proxy-agent"], "bin": { "browsers": "lib/main-cli.js" } }, "sha512-HGM8iAmGTf+Y7t0373szVbTmt3d7vPkYL/1bpOkOFO0YUYLgSeuYBCzESklogNPvOBnZ/MRD5f07OkpqH1trtA=="],
 

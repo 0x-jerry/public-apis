@@ -16,6 +16,7 @@
     "@modelcontextprotocol/hono": "^2.0.0-alpha.2",
     "@modelcontextprotocol/server": "^2.0.0-alpha.2",
     "@mozilla/readability": "^0.6.0",
+    "@paddleocr/api-sdk": "^0.1.0",
     "@resvg/resvg-wasm": "^2.6.2",
     "cheerio": "^1.2.0",
     "dayjs": "^1.11.21",
