@@ -1,24 +1,10 @@
 import { sleep } from '@0x-jerry/utils'
 import type { OcrResultItem } from './types.ts'
-import QuickLRU from 'quick-lru'
 export type { LayoutParsingResult, OcrResultItem } from './types.ts'
 
 const BASE_URL = 'https://paddleocr.aistudio-app.com'
 
-const cache = new QuickLRU<string, OcrResultItem[]>({ maxSize: 100, maxAge: 86_400_000 })
-
 export async function paddleocr(fileUrl: string, options: { token: string; model?: string; timeout?: number }): Promise<OcrResultItem[]> {
-  const cached = cache.get(fileUrl)
-  if (cached !== undefined) {
-    return cached
-  }
-
-  const result = await _paddleocr(fileUrl, options)
-  cache.set(fileUrl, result)
-  return result
-}
-
-async function _paddleocr(fileUrl: string, options: { token: string; model?: string; timeout?: number }): Promise<OcrResultItem[]> {
   const token = options.token
   const model = options.model ?? 'PaddleOCR-VL-1.6'
   const timeout = options?.timeout ?? 20_000
