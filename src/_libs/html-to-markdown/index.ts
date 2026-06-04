@@ -31,15 +31,20 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
   const metadata = extractMetadata(doc)
 
   removeInvisibleTags(doc)
-  removeEmptyImageTags(doc)
 
-  let article = doc.body.innerHTML
+  let htmlContent = ""
 
-  if (mode === "readable" && isProbablyReaderable(doc)) {
-    article = new Readability(doc).parse()?.content || article
+  if (mode === "readable") {
+    removeEmptyImageTags(doc)
+
+    if (isProbablyReaderable(doc)) {
+      htmlContent = new Readability(doc).parse()?.content || ""
+    }
   }
 
-  const markdown = turndown.turndown(article)
+  htmlContent = htmlContent || doc.documentElement.outerHTML
+
+  const markdown = turndown.turndown(htmlContent)
 
   const metadataStr = `---\n${stringify(metadata, {})}---`
   return metadataStr + "\n" + markdown
@@ -50,7 +55,7 @@ function removeEmptyImageTags(doc: Document) {
 }
 
 function removeInvisibleTags(doc: Document) {
-  const tags = ["script", "style", "noscript", "template"]
+  const tags = ["script", "head", "style", "noscript", "template"]
 
   for (const tag of tags) {
     doc.querySelectorAll(tag).forEach((el) => el.remove())
