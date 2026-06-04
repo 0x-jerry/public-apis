@@ -9,7 +9,7 @@ server.registerTool(
     inputSchema: z.object({
       url: z.string().describe('The URL of the webpage to convert to Markdown'),
       offset: z.number().optional().default(0).describe('Character index to start output from (default: 0)'),
-      limit: z.number().optional().default(50000).describe('Maximum character length of the output (default: 50000)'),
+      limit: z.number().optional().default(30000).describe('Maximum character length of the output (default: 30000)'),
       mode: z.enum(['full', 'readable']).optional().default('readable').describe('Conversion mode: "readable" extracts article content, "full" keeps entire body'),
     }),
   },

@@ -184,7 +184,7 @@ Fetches a URL using a headless Chrome browser (via Puppeteer), extracts page met
 | Field   | Type   | Default  | Description                                    |
 |---------|--------|----------|------------------------------------------------|
 | `url`   | string | —        | URL of the webpage to convert                  |
-| `limit` | number | 50000    | Maximum character length of the output         |
+| `limit` | number | 30000    | Maximum character length of the output         |
 | `offset`| number | 0        | Character offset to start from                 |
 | `mode`  | string | `readable` | Extraction mode: `full` or `readable`          |
 
@@ -230,7 +230,7 @@ Extracts text and layout from a document/image using PaddleOCR. Provide a URL to
 |---------|--------|--------------|----------------------------------------------------------------------------------------------|
 | `url`   | string | —            | URL of the document/image to OCR                                                             |
 | `mode`  | string | `markdown`   | Output mode: `layout` (with position/label annotations) or `markdown` (plain markdown only)  |
-| `limit` | number | 50000        | Maximum character length of output                                                           |
+| `limit` | number | 30000        | Maximum character length of output                                                           |
 | `offset`| number | 0            | Character offset to start from                                                               |
 
 **Output:** `text` — Extracted Markdown text.

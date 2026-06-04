@@ -13,7 +13,7 @@ server.registerTool(
       url: z.string().describe("URL of the document/image to OCR"),
       mode: z.enum(["layout", "markdown"]).optional().default("markdown").describe("Output mode: 'layout' includes position/label annotations, 'markdown' returns plain markdown without layout info (default: 'markdown')"),
       offset: z.number().optional().default(0).describe('Character index to start output from (default: 0)'),
-      limit: z.number().optional().default(50000).describe('Maximum character length of the output (default: 50000)'),
+      limit: z.number().optional().default(30000).describe('Maximum character length of the output (default: 30000)'),
     }),
   },
   async ({ url, mode, offset, limit }, ctx) => {
