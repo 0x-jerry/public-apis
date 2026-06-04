@@ -8,16 +8,6 @@ const turndown = new TurndownService({
   codeBlockStyle: "fenced",
 })
 
-turndown.addRule("noEmptyDescImg", {
-  filter: (node) => {
-    if (!(node instanceof HTMLElement)) return false
-    if (node.tagName !== "IMG") return false
-    const alt = node.getAttribute("alt")
-    return !alt || alt.trim() === ""
-  },
-  replacement: () => "",
-})
-
 export interface HtmlToMarkdownOptions {
   /** `"readable"` (default) extracts article content, `"full"` converts the entire body */
   mode?: "full" | "readable"
@@ -41,6 +31,7 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
   const metadata = extractMetadata(doc)
 
   removeInvisibleTags(doc)
+  removeEmptyImageTags(doc)
 
   let article = doc.body.innerHTML
 
@@ -52,6 +43,10 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
 
   const metadataStr = `---\n${stringify(metadata, {})}---`
   return metadataStr + "\n" + markdown
+}
+
+function removeEmptyImageTags(doc: Document) {
+  doc.querySelectorAll("img").forEach((el) => !el.getAttribute("alt") && el.remove())
 }
 
 function removeInvisibleTags(doc: Document) {
