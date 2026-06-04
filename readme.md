@@ -226,11 +226,12 @@ Extracts text and layout from a document/image using PaddleOCR. Provide a URL to
 
 **Input:**
 
-| Field   | Type   | Default | Description                          |
-|---------|--------|---------|--------------------------------------|
-| `url`   | string | —       | URL of the document/image to OCR     |
-| `limit` | number | 50000   | Maximum character length of output   |
-| `offset`| number | 0       | Character offset to start from       |
+| Field   | Type   | Default      | Description                                                                                  |
+|---------|--------|--------------|----------------------------------------------------------------------------------------------|
+| `url`   | string | —            | URL of the document/image to OCR                                                             |
+| `mode`  | string | `markdown`   | Output mode: `layout` (with position/label annotations) or `markdown` (plain markdown only)  |
+| `limit` | number | 50000        | Maximum character length of output                                                           |
+| `offset`| number | 0            | Character offset to start from                                                               |
 
 **Output:** `text` — Extracted Markdown text.
 
