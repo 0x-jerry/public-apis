@@ -35,7 +35,9 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
   let htmlContent = ""
 
   if (mode === "readable") {
-    removeEmptyImageTags(doc)
+    removeEmptyImageDescTags(doc)
+    removeEmptyLinkDescTags(doc)
+    removeEmbedTags(doc)
 
     if (isProbablyReaderable(doc)) {
       htmlContent = new Readability(doc).parse()?.content || ""
@@ -50,8 +52,20 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
   return metadataStr + "\n" + markdown
 }
 
-function removeEmptyImageTags(doc: Document) {
+function removeEmptyImageDescTags(doc: Document) {
   doc.querySelectorAll("img").forEach((el) => !el.getAttribute("alt") && el.remove())
+}
+
+function removeEmptyLinkDescTags(doc: Document) {
+  doc.querySelectorAll("a").forEach((el) => !el.textContent.trim() && el.remove())
+}
+
+function removeEmbedTags(doc: Document) {
+  const tags = ["object", "embed", "iframe"]
+
+  for (const tag of tags) {
+    doc.querySelectorAll(tag).forEach((el) => el.remove())
+  }
 }
 
 function removeInvisibleTags(doc: Document) {
