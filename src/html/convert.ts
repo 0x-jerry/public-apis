@@ -12,6 +12,11 @@ async function fetchHtml(url: string) {
 }
 
 export async function htmlToMarkdown(url: string, options?: HtmlToMarkdownOptions) {
+  const resp = await fetch(url, { headers: { Accept: 'text/markdown' } })
+  if (resp.ok) {
+    return await resp.text()
+  }
+
   const raw = await fetchHtml(url)
   return convertToMarkdown(raw, options)
 }

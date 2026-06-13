@@ -48,7 +48,7 @@ export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
 
   const markdown = turndown.turndown(htmlContent)
 
-  const metadataStr = `---\n${stringify(metadata, {})}---`
+  const metadataStr = `---\n${stringify(metadata)}---`
   return metadataStr + "\n" + markdown
 }
 
