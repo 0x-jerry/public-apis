@@ -1,19 +1,30 @@
-import { decode, GIF, Image } from 'imagescript'
-import jsqr from 'jsqr'
-import { app } from './_app.ts'
+import { app } from "./_app.ts"
 
-app.post('/scan', async (ctx) => {
+app.post("/scan", async (ctx) => {
   const form = await ctx.req.formData()
-  const file = form.get('file') as File
+  const file = form.get("file") as File
   if (!file?.name) {
-    throw Error('Not found file')
+    throw Error("Not found file")
   }
+
+  const { decode, GIF } = await import("imagescript")
 
   const imgInfo = await decode(new Uint8Array(await file.arrayBuffer()))
 
-  const imgBuffer = (imgInfo as Image).bitmap || (imgInfo as GIF).at(0)?.bitmap
+  let imgBuffer: Uint8ClampedArray | undefined
 
-  const code = jsqr(imgBuffer as Uint8ClampedArray, imgInfo.width, imgInfo.height)
+  if (imgInfo instanceof GIF) {
+    imgBuffer = imgInfo.at(0)?.bitmap
+  } else {
+    imgBuffer = imgInfo?.bitmap
+  }
+
+  if (!imgBuffer) {
+    throw Error("Not found image buffer")
+  }
+
+  const jsqr = (await import("jsqr")).default
+  const code = jsqr(imgBuffer, imgInfo.width, imgInfo.height)
 
   return ctx.json({
     version: code?.version,

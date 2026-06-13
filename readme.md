@@ -77,25 +77,6 @@ Decodes a QR code from an uploaded image file.
 
 ---
 
-### Link Preview
-
-#### Get Link Metadata
-```
-GET /link/metadata?url=<url>
-```
-
-Fetches metadata (title, description, image, etc.) for any URL.
-
-**Query Parameters:**
-
-| Param | Type   | Description     |
-|-------|--------|-----------------|
-| `url` | string | URL to preview  |
-
-**Response:** `application/json`
-
----
-
 ### HTML to Markdown
 
 #### Convert HTML to Markdown
@@ -241,28 +222,6 @@ Extracts text and layout from a document/image using PaddleOCR. Provide a URL to
 |---------------|--------------------------------------|
 | `x-ocr-token` | API authentication token (required)  |
 | `x-ocr-model` | Model name (default: `PaddleOCR-VL-1.6`) |
-
----
-
-### SVG to PNG
-
-#### Convert SVG to PNG
-```
-POST /svg/png
-```
-
-Converts an SVG to a PNG image.
-
-**Request:** `application/json`
-
-| Field | Type   | Description                                |
-|-------|--------|--------------------------------------------|
-| `svg` | string | Raw SVG markup                             |
-| `url` | string | URL to fetch SVG from (alternative to svg) |
-
-> Provide either `svg` or `url`.
-
-**Response:** `image/png`
 
 ---
 
