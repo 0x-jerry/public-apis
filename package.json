@@ -16,21 +16,20 @@
     "@modelcontextprotocol/hono": "^2.0.0-alpha.2",
     "@modelcontextprotocol/server": "^2.0.0-alpha.2",
     "@mozilla/readability": "^0.6.0",
-    "@paddleocr/api-sdk": "^0.1.0",
     "@resvg/resvg-wasm": "^2.6.2",
     "cheerio": "^1.2.0",
     "dayjs": "^1.11.21",
     "fast-xml-parser": "^5.8.0",
-    "hono": "^4.12.23",
+    "hono": "^4.12.25",
     "imagescript": "^1.3.1",
     "jsdom": "^29.1.1",
     "jsqr": "^1.4.0",
     "link-preview-js": "^4.0.3",
-    "marked": "^18.0.4",
+    "marked": "^18.0.5",
     "puppeteer-core": "^25.1.0",
     "qrcode": "^1.5.4",
     "quick-lru": "^7.3.0",
-    "turndown": "^7.2.0",
+    "turndown": "^7.2.4",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
   },
@@ -38,9 +37,9 @@
     "@0x-jerry/x-release": "^3.0.5",
     "@cfworker/json-schema": "^4.1.1",
     "@types/jsdom": "^28.0.3",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/qrcode": "^1.5.6",
-    "@types/turndown": "^5.0.0"
+    "@types/turndown": "^5.0.6"
   },
   "peerDependencies": {
     "typescript": "^6.0.3"
