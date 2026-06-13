@@ -22,16 +22,12 @@ function Layout(props: SiteData) {
       <head>
         <title>{props.title}</title>
         <link
-          rel='stylesheet'
-          href='https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.css'
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.css"
         />
-        <style>
-          {props.style}
-        </style>
+        <style>{props.style}</style>
       </head>
-      <body>
-        {props.children}
-      </body>
+      <body>{props.children}</body>
     </html>
   )
 }
@@ -40,12 +36,9 @@ function RenderMarkdownPage(props: { markdown: string }) {
   const md = marked.parse(props.markdown) as string
 
   return (
-    <Layout title='Some API'>
-      <div data-color-mode='auto' data-dark-theme='auto' class='markdown-body'>
-        <div
-          style={{ width: '768px', margin: 'auto' }}
-          dangerouslySetInnerHTML={{ __html: md }}
-        />
+    <Layout title="Some API">
+      <div data-color-mode="auto" data-dark-theme="auto" class="markdown-body">
+        <div style={{ width: '768px', margin: 'auto' }} dangerouslySetInnerHTML={{ __html: md }} />
       </div>
     </Layout>
   )

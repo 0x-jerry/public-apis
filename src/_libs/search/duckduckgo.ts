@@ -7,12 +7,14 @@ export async function searchDuckDuckGo(query: string): Promise<SearchResponse> {
   const html = await res.text()
   const $ = load(html)
 
-  const results = $('.result').map((_, item) => {
-    const title = $(item).find('.result__a').text().trim()
-    const url = $(item).find('.result__url').text().trim()
-    const snippet = $(item).find('.result__snippet').text().trim()
-    if (title && url) return { title, url, snippet }
-  }).get()
+  const results = $('.result')
+    .map((_, item) => {
+      const title = $(item).find('.result__a').text().trim()
+      const url = $(item).find('.result__url').text().trim()
+      const snippet = $(item).find('.result__snippet').text().trim()
+      if (title && url) return { title, url, snippet }
+    })
+    .get()
 
   let prev: string | undefined
   let next: string | undefined
@@ -32,9 +34,11 @@ export async function searchDuckDuckGo(query: string): Promise<SearchResponse> {
     const value = $(form).find('input[type="submit"]').attr('value') ?? ''
     const action = $(form).attr('action') ?? '/html/'
     const params = new URLSearchParams()
-    $(form).find('input[type="hidden"]').each((_, input) => {
-      params.set($(input).attr('name') ?? '', $(input).attr('value') ?? '')
-    })
+    $(form)
+      .find('input[type="hidden"]')
+      .each((_, input) => {
+        params.set($(input).attr('name') ?? '', $(input).attr('value') ?? '')
+      })
     const formUrl = `https://html.duckduckgo.com${action}?${params.toString()}`
     if (/prev/i.test(value)) prev = formUrl
     if (/next/i.test(value)) next = formUrl

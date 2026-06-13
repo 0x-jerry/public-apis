@@ -11,7 +11,7 @@ export async function searchBing(query: string): Promise<SearchResponse | null> 
     await page.goto(url, { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[aria-label="Search Results"]')
 
-    return await page.evaluate(`(() => {
+    return (await page.evaluate(`(() => {
       const results = [];
       const items = document.querySelectorAll('li.b_algo');
       for (const item of items) {
@@ -33,7 +33,7 @@ export async function searchBing(query: string): Promise<SearchResponse | null> 
       }
 
       return { results, prev, next };
-    })()`) as SearchResponse
+    })()`)) as SearchResponse
   } finally {
     await page.close()
   }

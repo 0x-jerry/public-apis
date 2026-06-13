@@ -1,13 +1,13 @@
-import { app } from "./_app.ts"
+import { app } from './_app.ts'
 
-app.post("/scan", async (ctx) => {
+app.post('/scan', async (ctx) => {
   const form = await ctx.req.formData()
-  const file = form.get("file") as File
+  const file = form.get('file') as File
   if (!file?.name) {
-    throw Error("Not found file")
+    throw Error('Not found file')
   }
 
-  const { decode, GIF } = await import("imagescript")
+  const { decode, GIF } = await import('imagescript')
 
   const imgInfo = await decode(new Uint8Array(await file.arrayBuffer()))
 
@@ -20,10 +20,10 @@ app.post("/scan", async (ctx) => {
   }
 
   if (!imgBuffer) {
-    throw Error("Not found image buffer")
+    throw Error('Not found image buffer')
   }
 
-  const jsqr = (await import("jsqr")).default
+  const jsqr = (await import('jsqr')).default
   const code = jsqr(imgBuffer, imgInfo.width, imgInfo.height)
 
   return ctx.json({

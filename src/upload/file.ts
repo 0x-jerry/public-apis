@@ -24,7 +24,7 @@ async function evictOldest(dir: string) {
       .map(async (e) => {
         const s = await stat(join(dir, e.name))
         return { name: e.name, size: s.size, mtime: s.mtimeMs }
-      })
+      }),
   )
 
   files.sort((a, b) => a.mtime - b.mtime)

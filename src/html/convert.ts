@@ -1,5 +1,8 @@
 import { fetchHtmlWithBrowser } from '../_libs/browser/index.ts'
-import { htmlToMarkdown as convertToMarkdown, type HtmlToMarkdownOptions } from '../_libs/html-to-markdown/index.ts'
+import {
+  htmlToMarkdown as convertToMarkdown,
+  type HtmlToMarkdownOptions,
+} from '../_libs/html-to-markdown/index.ts'
 
 async function fetchHtml(url: string) {
   let html: string | null = await fetchHtmlWithBrowser(url)

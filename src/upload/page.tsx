@@ -39,7 +39,7 @@ app.get('/', (ctx) => {
         <button id="upload-btn">Upload</button>
         <div id="result" class="result"></div>
       </div>
-    </UploadPage>
+    </UploadPage>,
   )
 })
 

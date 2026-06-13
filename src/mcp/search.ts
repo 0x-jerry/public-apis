@@ -32,13 +32,15 @@ server.registerTool(
     description: 'Search the web using Bing or DuckDuckGo',
     inputSchema: z.object({
       q: z.string().describe('Search query'),
-      engine: z.enum(['bing', 'duckduckgo']).optional().default('duckduckgo').describe('Search engine to use (default: duckduckgo)'),
+      engine: z
+        .enum(['bing', 'duckduckgo'])
+        .optional()
+        .default('duckduckgo')
+        .describe('Search engine to use (default: duckduckgo)'),
     }),
   },
   async ({ q, engine }) => {
-    const result = engine === 'bing'
-      ? await searchBing(q)
-      : await searchDuckDuckGo(q)
+    const result = engine === 'bing' ? await searchBing(q) : await searchDuckDuckGo(q)
 
     return {
       content: [{ type: 'text' as const, text: toMarkdown(result) }],
