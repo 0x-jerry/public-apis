@@ -13,15 +13,21 @@ app.use(logger())
 app.use(trimTrailingSlash())
 
 app.use(async (ctx, next) => {
-  await next()
+  try {
+    await next()
 
-  if (ctx.error) {
-    console.error(ctx.error)
+    if (ctx.error) {
+      console.error(ctx.error)
 
-    ctx.status(400)
-    ctx.res = ctx.json({
-      message: String(ctx.error),
-    })
+      ctx.status(400)
+      ctx.res = ctx.json({
+        message: String(ctx.error),
+      })
+    }
+  } catch (err) {
+    console.error(err)
+
+    ctx.status(500)
   }
 })
 
