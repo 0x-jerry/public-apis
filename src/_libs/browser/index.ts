@@ -2,14 +2,14 @@ import puppeteer, { type Browser } from 'puppeteer-core'
 import { sleep } from '@0x-jerry/utils'
 
 let browser: Browser | null = null
-let browserPromise: Promise<Browser> | null = null
+let browserPromise: Promise<Browser | null> | null = null
 
 function isBrowserEnabled() {
   const v = process.env.BROWSER_WS_ENABLED
   return v === 'true' || v === '1'
 }
 
-export function getBrowser(): Promise<Browser> | Browser | null {
+export function getBrowser(): Promise<Browser | null> | Browser | null {
   if (!isBrowserEnabled()) {
     return null
   }
@@ -28,7 +28,8 @@ export function getBrowser(): Promise<Browser> | Browser | null {
       })
       .catch((e) => {
         browserPromise = null
-        throw e
+        console.debug(e)
+        return null
       })
   }
   return browserPromise

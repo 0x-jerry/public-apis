@@ -2,6 +2,7 @@ import TurndownService from 'turndown'
 import { isProbablyReaderable, Readability } from '@mozilla/readability'
 import { JSDOM } from 'jsdom'
 import { stringify } from 'yaml'
+import { isString } from '@0x-jerry/utils'
 
 const turndown = new TurndownService({
   headingStyle: 'atx',
@@ -20,14 +21,13 @@ export interface HtmlToMarkdownOptions {
  * article content, stripping navigation, sidebars, and other clutter.
  * In `full` mode, the entire HTML body is converted as-is.
  *
- * @param html - Raw HTML string to convert
+ * @param htmlOrDom - Raw HTML string or HTML document to convert
  * @returns Markdown string prefixed with YAML front matter
  */
-export function htmlToMarkdown(html: string, options?: HtmlToMarkdownOptions) {
+export function htmlToMarkdown(htmlOrDom: string | Document, options?: HtmlToMarkdownOptions) {
   const { mode = 'readable' } = options ?? {}
 
-  const dom = new JSDOM(html)
-  const doc = dom.window.document
+  const doc = isString(htmlOrDom) ? new JSDOM(htmlOrDom).window.document : htmlOrDom
   const metadata = extractMetadata(doc)
 
   removeInvisibleTags(doc)
