@@ -3,20 +3,17 @@ package index
 import (
 	"bytes"
 	"net/http"
-	"os"
+
+	publicapis "public-apis"
 
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	data, err := os.ReadFile("readme.md")
-	if err != nil {
-		http.Error(w, "readme not found", http.StatusNotFound)
-		return
-	}
-
 	var buf bytes.Buffer
-	if err := goldmark.Convert(data, &buf); err != nil {
+	md := goldmark.New(goldmark.WithExtensions(extension.Table))
+	if err := md.Convert(publicapis.Readme, &buf); err != nil {
 		http.Error(w, "failed to render", http.StatusInternalServerError)
 		return
 	}
