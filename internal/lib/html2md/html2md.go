@@ -2,7 +2,6 @@ package html2md
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -11,7 +10,6 @@ import (
 	"github.com/JohannesKaufmann/html-to-markdown/v2/converter"
 	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/base"
 	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/commonmark"
-	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/table"
 	"github.com/goccy/go-yaml"
 	"golang.org/x/net/html"
 )
@@ -20,32 +18,11 @@ var conv = converter.NewConverter(
 	converter.WithPlugins(
 		base.NewBasePlugin(),
 		commonmark.NewCommonmarkPlugin(),
-		table.NewTablePlugin(),
-		&relativeLinkPlugin{},
 	),
 )
 
-type relativeLinkPlugin struct{}
-
-type ctxKey int
-
-const baseURLKey ctxKey = iota
-
-func (p *relativeLinkPlugin) Name() string {
-	return "relative-link"
-}
-
-func (p *relativeLinkPlugin) Init(conv *converter.Converter) error {
-	conv.Register.PreRenderer(p.handlePreRender, converter.PriorityStandard)
-	return nil
-}
-
-func (p *relativeLinkPlugin) handlePreRender(ctx converter.Context, doc *html.Node) {
-	raw, ok := ctx.Value(baseURLKey).(string)
-	if !ok || raw == "" {
-		return
-	}
-	baseURL, err := url.Parse(raw)
+func resolveRelativeLinks(doc *html.Node, rootUrl string) {
+	baseURL, err := url.Parse(rootUrl)
 	if err != nil {
 		return
 	}
@@ -111,6 +88,10 @@ func Convert(htmlStr string, opts *Options) (string, error) {
 	metadata.URL = opts.URL
 	removeInvisibleTags(doc)
 
+	if opts.URL != "" {
+		resolveRelativeLinks(doc, opts.URL)
+	}
+
 	var content string
 
 	if opts.Mode == "readable" {
@@ -133,14 +114,7 @@ func Convert(htmlStr string, opts *Options) (string, error) {
 		content = renderHTML(doc)
 	}
 
-
-	var convertOpts []converter.ConvertOptionFunc
-	if opts.URL != "" {
-		ctx := context.WithValue(context.Background(), baseURLKey, opts.URL)
-		convertOpts = append(convertOpts, converter.WithContext(ctx))
-	}
-
-	markdown, err := conv.ConvertString(content, convertOpts...)
+	markdown, err := conv.ConvertString(content)
 	if err != nil {
 		return "", fmt.Errorf("convert to markdown: %w", err)
 	}
