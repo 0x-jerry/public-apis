@@ -1,19 +1,21 @@
-FROM oven/bun:1-slim AS base
+FROM golang:alpine AS builder
 WORKDIR /app
 
-FROM base AS deps
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+COPY go.mod go.sum ./
+RUN go mod download
 
-FROM base
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o server ./cmd/server
+
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY main.ts tsconfig.json readme.md ./
-COPY src ./src
+
+COPY --from=builder /app/server .
+COPY readme.md .
 
 ENV NODE_ENV=production
-ENV BUN_GARBAGE_COLLECTOR_LEVEL=2
 ENV PORT=3000
 EXPOSE 3000
 
-CMD ["bun", "run", "--smol", "main.ts"]
+CMD ["./server"]

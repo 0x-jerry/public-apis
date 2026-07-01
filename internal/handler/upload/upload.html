@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upload</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1f2328; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.container { width: 100%; max-width: 400px; margin: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-size: 20px; font-weight: 600; color: #1f2328; }
+label { font-size: 13px; font-weight: 500; color: #656d76; display: flex; flex-direction: column; gap: 6px; }
+input { padding: 12px; border-radius: 6px; border: 1px solid #d0d7de; background: #f6f8fa; color: #1f2328; font-size: 16px; }
+input:focus { outline: none; border-color: #0969da; box-shadow: 0 0 0 3px rgba(9,105,218,0.15); }
+.droparea { padding: 32px 16px; border-radius: 6px; border: 2px dashed #d0d7de; background: #f6f8fa; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.droparea:hover, .droparea.dragover { border-color: #0969da; background: #ddf4ff; }
+.droparea p { font-size: 14px; color: #656d76; }
+.droparea p.name { color: #1f2328; font-weight: 500; }
+button { padding: 12px; border-radius: 6px; border: 1px solid rgba(31,35,40,0.15); background: #1f883d; color: #fff; font-size: 16px; font-weight: 500; cursor: pointer; }
+button:hover { background: #1a7f37; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.result { font-size: 13px; padding: 10px; border-radius: 6px; background: #f6f8fa; border: 1px solid #d0d7de; display: none; }
+.result.error { border-color: #cf222e; display: block; }
+.result.success { border-color: #1f883d; display: block; }
+.result code { word-break: break-all; font-size: 12px; display: block; margin-top: 4px; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Upload File</h1>
+<label>
+Token
+<input type="password" id="token" placeholder="Bearer token" />
+</label>
+<div class="droparea" id="droparea">
+<p id="droparea-text">Drop file here or click to select</p>
+<input type="file" id="file" class="hidden" />
+</div>
+<button id="upload-btn">Upload</button>
+<div id="result" class="result"></div>
+</div>
+<script>
+const tokenEl = document.getElementById('token')
+const fileEl = document.getElementById('file')
+const droparea = document.getElementById('droparea')
+const dropText = document.getElementById('droparea-text')
+const btn = document.getElementById('upload-btn')
+const resultEl = document.getElementById('result')
+
+tokenEl.value = localStorage.getItem('upload_token') || ''
+
+tokenEl.addEventListener('change', () => {
+localStorage.setItem('upload_token', tokenEl.value)
+})
+
+droparea.addEventListener('click', () => fileEl.click())
+
+fileEl.addEventListener('change', () => {
+if (fileEl.files[0]) {
+dropText.className = 'name'
+dropText.textContent = fileEl.files[0].name
+}
+})
+
+droparea.addEventListener('dragover', (e) => {
+e.preventDefault()
+droparea.classList.add('dragover')
+})
+
+droparea.addEventListener('dragleave', () => {
+droparea.classList.remove('dragover')
+})
+
+droparea.addEventListener('drop', (e) => {
+e.preventDefault()
+droparea.classList.remove('dragover')
+if (e.dataTransfer.files[0]) {
+fileEl.files = e.dataTransfer.files
+dropText.className = 'name'
+dropText.textContent = e.dataTransfer.files[0].name
+}
+})
+
+function show(msg, cls) {
+resultEl.className = 'result ' + cls
+resultEl.innerHTML = msg
+}
+
+btn.addEventListener('click', async () => {
+const file = fileEl.files[0]
+if (!file) {
+show('Please select a file', 'error')
+return
+}
+
+const form = new FormData()
+form.append('file', file)
+
+btn.disabled = true
+btn.textContent = 'Uploading...'
+show('', '')
+
+try {
+const headers = {}
+const token = tokenEl.value.trim()
+if (token) headers['Authorization'] = 'Bearer ' + token
+
+const res = await fetch('/upload/file', { method: 'POST', body: form, headers })
+const data = await res.json()
+
+if (!res.ok) {
+show('Error: ' + (data.message || res.statusText), 'error')
+} else {
+show('Uploaded:<br><code>' + data.name + ' (' + (data.size / 1024 / 1024).toFixed(2) + ' MB)</code>', 'success')
+}
+} catch (e) {
+show('Error: ' + e.message, 'error')
+} finally {
+btn.disabled = false
+btn.textContent = 'Upload'
+}
+})
+</script>
+</body>
+</html>
