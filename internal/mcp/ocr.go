@@ -31,16 +31,16 @@ func RegisterOCR(mcpServer *server.MCPServer, h *Handler) {
 }
 
 func (h *Handler) handleOCR(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	url := GetStringArg(request, "url")
+	url := request.GetString("url", "")
 	if url == "" {
 		return mcp.NewToolResultError("Missing url parameter"), nil
 	}
-	mode := GetStringArg(request, "mode")
+	mode := request.GetString("mode", "")
 	if mode == "" {
 		mode = "markdown"
 	}
-	offset := int(GetNumberArg(request, "offset"))
-	limit := int(GetNumberArg(request, "limit"))
+	offset := request.GetInt("offset", 0)
+	limit := request.GetInt("limit", 0)
 	if limit == 0 {
 		limit = 30000
 	}

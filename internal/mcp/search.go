@@ -23,11 +23,11 @@ func RegisterSearch(mcpServer *server.MCPServer, h *Handler) {
 }
 
 func (h *Handler) handleSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	q := GetStringArg(request, "q")
+	q := request.GetString("q", "")
 	if q == "" {
 		return mcp.NewToolResultError("Missing q parameter"), nil
 	}
-	engine := GetStringArg(request, "engine")
+	engine := request.GetString("engine", "")
 	if engine == "" {
 		engine = "duckduckgo"
 	}

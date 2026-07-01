@@ -1,13 +1,11 @@
 package mcp
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"public-apis/internal/config"
 	"public-apis/internal/lib/browser"
 
-	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
 
@@ -37,44 +35,6 @@ func NewServer(cfg *config.Config) *server.MCPServer {
 	RegisterOCR(s, h)
 
 	return s
-}
-
-func getArgs(request mcp.CallToolRequest) map[string]interface{} {
-	if m, ok := request.Params.Arguments.(map[string]interface{}); ok {
-		return m
-	}
-	return nil
-}
-
-func GetStringArg(request mcp.CallToolRequest, key string) string {
-	args := getArgs(request)
-	if args == nil {
-		return ""
-	}
-	if v, ok := args[key]; ok {
-		switch val := v.(type) {
-		case string:
-			return val
-		}
-	}
-	return ""
-}
-
-func GetNumberArg(request mcp.CallToolRequest, key string) float64 {
-	args := getArgs(request)
-	if args == nil {
-		return 0
-	}
-	if v, ok := args[key]; ok {
-		switch val := v.(type) {
-		case float64:
-			return val
-		case json.Number:
-			f, _ := val.Float64()
-			return f
-		}
-	}
-	return 0
 }
 
 func Truncate(s string, offset, limit int) string {

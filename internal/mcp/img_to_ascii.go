@@ -27,11 +27,11 @@ func RegisterImgToAscii(mcpServer *server.MCPServer, h *Handler) {
 }
 
 func (h *Handler) handleImgToAscii(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	url := GetStringArg(request, "url")
+	url := request.GetString("url", "")
 	if url == "" {
 		return mcp.NewToolResultError("Missing url parameter"), nil
 	}
-	maxSize := int(GetNumberArg(request, "maxSize"))
+	maxSize := request.GetInt("maxSize", 0)
 	if maxSize == 0 {
 		maxSize = 80
 	}

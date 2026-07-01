@@ -1,6 +1,6 @@
 services:
   lightpanda:
-    image: lightpanda/browser:nightly
+    image: lightpanda/browser:latest
     restart: unless-stopped
     ports:
       - "9222:9222"

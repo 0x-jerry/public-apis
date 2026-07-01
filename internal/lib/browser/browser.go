@@ -3,7 +3,6 @@ package browser
 import (
 	"context"
 	"errors"
-	"strings"
 	"sync"
 	"time"
 
@@ -54,9 +53,8 @@ func (m *Manager) connect() (*rod.Browser, error) {
 		endpoint = "ws://127.0.0.1:9222"
 	}
 
-	controlURL := strings.Replace(endpoint, "ws", "http", 1)
 
-	browser := rod.New().ControlURL(controlURL)
+	browser := rod.New().ControlURL(endpoint)
 	if err := browser.Connect(); err != nil {
 		return nil, err
 	}
