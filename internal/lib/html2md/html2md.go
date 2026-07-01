@@ -2,6 +2,7 @@ package html2md
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -20,8 +21,70 @@ var conv = converter.NewConverter(
 		base.NewBasePlugin(),
 		commonmark.NewCommonmarkPlugin(),
 		table.NewTablePlugin(),
+		&relativeLinkPlugin{},
 	),
 )
+
+type relativeLinkPlugin struct{}
+
+type ctxKey int
+
+const baseURLKey ctxKey = iota
+
+func (p *relativeLinkPlugin) Name() string {
+	return "relative-link"
+}
+
+func (p *relativeLinkPlugin) Init(conv *converter.Converter) error {
+	conv.Register.PreRenderer(p.handlePreRender, converter.PriorityStandard)
+	return nil
+}
+
+func (p *relativeLinkPlugin) handlePreRender(ctx converter.Context, doc *html.Node) {
+	raw, ok := ctx.Value(baseURLKey).(string)
+	if !ok || raw == "" {
+		return
+	}
+	baseURL, err := url.Parse(raw)
+	if err != nil {
+		return
+	}
+
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			for i, a := range n.Attr {
+				if a.Key == "href" {
+					if rel := relativize(baseURL, a.Val); rel != "" {
+						n.Attr[i].Val = rel
+					}
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+}
+
+func relativize(baseURL *url.URL, href string) string {
+	if href == "" {
+		return ""
+	}
+	lower := strings.ToLower(href)
+	if strings.HasPrefix(lower, "javascript:") || strings.HasPrefix(lower, "mailto:") || strings.HasPrefix(lower, "tel:") {
+		return ""
+	}
+	u, err := url.Parse(href)
+	if err != nil || u.Host == "" {
+		return ""
+	}
+	if u.Host == baseURL.Host {
+		return u.RequestURI()
+	}
+	return ""
+}
 
 type Options struct {
 	Mode string
@@ -70,15 +133,14 @@ func Convert(htmlStr string, opts *Options) (string, error) {
 		content = renderHTML(doc)
 	}
 
-	var optsFuncs []converter.ConvertOptionFunc
+
+	var convertOpts []converter.ConvertOptionFunc
 	if opts.URL != "" {
-		u, err := url.Parse(opts.URL)
-		if err == nil && u.Host != "" {
-			optsFuncs = append(optsFuncs, converter.WithDomain(u.String()))
-		}
+		ctx := context.WithValue(context.Background(), baseURLKey, opts.URL)
+		convertOpts = append(convertOpts, converter.WithContext(ctx))
 	}
 
-	markdown, err := conv.ConvertString(content, optsFuncs...)
+	markdown, err := conv.ConvertString(content, convertOpts...)
 	if err != nil {
 		return "", fmt.Errorf("convert to markdown: %w", err)
 	}
