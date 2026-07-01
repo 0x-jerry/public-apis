@@ -12,7 +12,7 @@ type FetchResult struct {
 }
 
 func Fetch(rawURL string, accept string) (*FetchResult, error) {
-	client := surf.NewClient()
+	client := surf.NewClient().Builder().Impersonate().Chrome().Build().Unwrap()
 	defer client.Close()
 
 	req := client.Get(g.NewString(rawURL))
