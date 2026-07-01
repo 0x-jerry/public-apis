@@ -3,23 +3,35 @@ package html2md
 import (
 	"bytes"
 	"fmt"
+	"net/url"
 	"strings"
 
-	md "github.com/JohannesKaufmann/html-to-markdown"
 	readability "codeberg.org/readeck/go-readability/v2"
-	"golang.org/x/net/html"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/converter"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/base"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/commonmark"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/table"
 	"github.com/goccy/go-yaml"
+	"golang.org/x/net/html"
 )
 
-var converter = md.NewConverter("", true, nil)
+var conv = converter.NewConverter(
+	converter.WithPlugins(
+		base.NewBasePlugin(),
+		commonmark.NewCommonmarkPlugin(),
+		table.NewTablePlugin(),
+	),
+)
 
 type Options struct {
 	Mode string
+	URL  string
 }
 
 type Metadata struct {
 	Title       string `yaml:"title,omitempty"`
 	Description string `yaml:"description,omitempty"`
+	URL         string `yaml:"url,omitempty"`
 }
 
 func Convert(htmlStr string, opts *Options) (string, error) {
@@ -33,6 +45,7 @@ func Convert(htmlStr string, opts *Options) (string, error) {
 	}
 
 	metadata := extractMetadata(doc)
+	metadata.URL = opts.URL
 	removeInvisibleTags(doc)
 
 	var content string
@@ -57,7 +70,15 @@ func Convert(htmlStr string, opts *Options) (string, error) {
 		content = renderHTML(doc)
 	}
 
-	markdown, err := converter.ConvertString(content)
+	var optsFuncs []converter.ConvertOptionFunc
+	if opts.URL != "" {
+		u, err := url.Parse(opts.URL)
+		if err == nil && u.Host != "" {
+			optsFuncs = append(optsFuncs, converter.WithDomain(u.String()))
+		}
+	}
+
+	markdown, err := conv.ConvertString(content, optsFuncs...)
 	if err != nil {
 		return "", fmt.Errorf("convert to markdown: %w", err)
 	}

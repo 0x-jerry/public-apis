@@ -60,6 +60,9 @@ func (h *Handler) handleHTMLToMarkdown(ctx context.Context, request mcp.CallTool
 
 func (h *Handler) htmlToMarkdown(ctx context.Context, url string, mode string) (string, error) {
 	resp, err := http.Get(url)
+	
+	opts := &libhtml2md.Options{Mode: mode, URL: url}
+	
 	if err == nil {
 		defer resp.Body.Close()
 		contentType := resp.Header.Get("Content-Type")
@@ -78,17 +81,14 @@ func (h *Handler) htmlToMarkdown(ctx context.Context, url string, mode string) (
 			}
 
 			if readability.CheckDocument(doc) {
-				opts := &libhtml2md.Options{Mode: mode}
 				return libhtml2md.Convert(htmlStr, opts)
 			}
 
 			browserHTML, browserErr := h.browser.FetchHTML(ctx, url)
 			if browserErr == nil && browserHTML != "" {
-				opts := &libhtml2md.Options{Mode: mode}
 				return libhtml2md.Convert(browserHTML, opts)
 			}
 
-			opts := &libhtml2md.Options{Mode: mode}
 			return libhtml2md.Convert(htmlStr, opts)
 		}
 	}
@@ -98,6 +98,5 @@ func (h *Handler) htmlToMarkdown(ctx context.Context, url string, mode string) (
 		return "", fmt.Errorf("failed to fetch url: %w", err)
 	}
 
-	opts := &libhtml2md.Options{Mode: mode}
 	return libhtml2md.Convert(browserHTML, opts)
 }

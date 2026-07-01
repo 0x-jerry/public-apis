@@ -75,17 +75,17 @@ func (h *Handler) convert(ctx context.Context, url string) (string, error) {
 			}
 
 			if readability.CheckDocument(doc) {
-				opts := &libhtml2md.Options{Mode: "readable"}
+				opts := &libhtml2md.Options{Mode: "readable", URL: url}
 				return libhtml2md.Convert(htmlStr, opts)
 			}
 
 			browserHTML, browserErr := h.browser.FetchHTML(ctx, url)
 			if browserErr == nil && browserHTML != "" {
-				opts := &libhtml2md.Options{Mode: "readable"}
+				opts := &libhtml2md.Options{Mode: "readable", URL: url}
 				return libhtml2md.Convert(browserHTML, opts)
 			}
 
-			opts := &libhtml2md.Options{Mode: "readable"}
+			opts := &libhtml2md.Options{Mode: "readable", URL: url}
 			return libhtml2md.Convert(htmlStr, opts)
 		}
 	}
@@ -100,10 +100,10 @@ func (h *Handler) convert(ctx context.Context, url string) (string, error) {
 		}
 		defer resp2.Body.Close()
 		data, _ := io.ReadAll(resp2.Body)
-		opts := &libhtml2md.Options{Mode: "readable"}
+		opts := &libhtml2md.Options{Mode: "readable", URL: url}
 		return libhtml2md.Convert(string(data), opts)
 	}
 
-	opts := &libhtml2md.Options{Mode: "readable"}
+	opts := &libhtml2md.Options{Mode: "readable", URL: url}
 	return libhtml2md.Convert(browserHTML, opts)
 }
