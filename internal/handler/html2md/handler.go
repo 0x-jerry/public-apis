@@ -3,12 +3,12 @@ package html2md
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
 	"public-apis/internal/config"
 	"public-apis/internal/lib/browser"
+	"public-apis/internal/lib/fetch"
 	libhtml2md "public-apis/internal/lib/html2md"
 	readability "codeberg.org/readeck/go-readability/v2"
 	"github.com/go-chi/chi/v5"
@@ -49,61 +49,41 @@ func (h *Handler) toMarkdown(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) convert(ctx context.Context, url string) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Accept", "text/markdown")
+	fr, fetchErr := fetch.Fetch(url, "text/markdown")
+	opts := &libhtml2md.Options{Mode: "readable", URL: url}
 
-	resp, clientErr := http.DefaultClient.Do(req)
-	if clientErr == nil {
-		defer resp.Body.Close()
-		contentType := resp.Header.Get("Content-Type")
-
-		if resp.StatusCode < 400 && strings.Contains(contentType, "text/markdown") {
-			data, _ := io.ReadAll(resp.Body)
-			return string(data), nil
+	if fetchErr == nil {
+		if fr.StatusCode < 400 && strings.Contains(fr.ContentType, "text/markdown") {
+			return fr.Body, nil
 		}
 
-		if resp.StatusCode < 400 && strings.Contains(contentType, "text/html") {
-			data, _ := io.ReadAll(resp.Body)
-			htmlStr := string(data)
-
-			doc, parseErr := html.Parse(strings.NewReader(htmlStr))
+		if fr.StatusCode < 400 && strings.Contains(fr.ContentType, "text/html") {
+			doc, parseErr := html.Parse(strings.NewReader(fr.Body))
 			if parseErr != nil {
 				return "", parseErr
 			}
 
 			if readability.CheckDocument(doc) {
-				opts := &libhtml2md.Options{Mode: "readable", URL: url}
-				return libhtml2md.Convert(htmlStr, opts)
+				return libhtml2md.Convert(fr.Body, opts)
 			}
 
 			browserHTML, browserErr := h.browser.FetchHTML(ctx, url)
 			if browserErr == nil && browserHTML != "" {
-				opts := &libhtml2md.Options{Mode: "readable", URL: url}
 				return libhtml2md.Convert(browserHTML, opts)
 			}
 
-			opts := &libhtml2md.Options{Mode: "readable", URL: url}
-			return libhtml2md.Convert(htmlStr, opts)
+			return libhtml2md.Convert(fr.Body, opts)
 		}
 	}
 
 	browserHTML, err := h.browser.FetchHTML(ctx, url)
 	if err != nil {
-		req2, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
-		req2.Header.Set("Accept", "text/html")
-		resp2, err2 := http.DefaultClient.Do(req2)
-		if err2 != nil {
-			return "", fmt.Errorf("failed to fetch url: %w", err2)
+		fr2, fetchErr2 := fetch.Fetch(url, "text/html")
+		if fetchErr2 != nil {
+			return "", fmt.Errorf("failed to fetch url: %w", fetchErr2)
 		}
-		defer resp2.Body.Close()
-		data, _ := io.ReadAll(resp2.Body)
-		opts := &libhtml2md.Options{Mode: "readable", URL: url}
-		return libhtml2md.Convert(string(data), opts)
+		return libhtml2md.Convert(fr2.Body, opts)
 	}
 
-	opts := &libhtml2md.Options{Mode: "readable", URL: url}
 	return libhtml2md.Convert(browserHTML, opts)
 }

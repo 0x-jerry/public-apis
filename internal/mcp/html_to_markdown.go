@@ -3,11 +3,10 @@ package mcp
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
 	"strings"
 
 	libhtml2md "public-apis/internal/lib/html2md"
+	"public-apis/internal/lib/fetch"
 
 	readability "codeberg.org/readeck/go-readability/v2"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -59,29 +58,22 @@ func (h *Handler) handleHTMLToMarkdown(ctx context.Context, request mcp.CallTool
 }
 
 func (h *Handler) htmlToMarkdown(ctx context.Context, url string, mode string) (string, error) {
-	resp, err := http.Get(url)
+	fr, err := fetch.Fetch(url, "text/markdown")
 	
 	opts := &libhtml2md.Options{Mode: mode, URL: url}
 	
 	if err == nil {
-		defer resp.Body.Close()
-		contentType := resp.Header.Get("Content-Type")
-
-		if resp.StatusCode < 400 && strings.Contains(contentType, "text/markdown") {
-			data, _ := io.ReadAll(resp.Body)
-			return string(data), nil
+		if fr.StatusCode < 400 && strings.Contains(fr.ContentType, "text/markdown") {
+			return fr.Body, nil
 		}
-		if resp.StatusCode < 400 && strings.Contains(contentType, "text/html") {
-			data, _ := io.ReadAll(resp.Body)
-			htmlStr := string(data)
-
-			doc, parseErr := html.Parse(strings.NewReader(htmlStr))
+		if fr.StatusCode < 400 && strings.Contains(fr.ContentType, "text/html") {
+			doc, parseErr := html.Parse(strings.NewReader(fr.Body))
 			if parseErr != nil {
 				return "", parseErr
 			}
 
 			if readability.CheckDocument(doc) {
-				return libhtml2md.Convert(htmlStr, opts)
+				return libhtml2md.Convert(fr.Body, opts)
 			}
 
 			browserHTML, browserErr := h.browser.FetchHTML(ctx, url)
@@ -89,7 +81,7 @@ func (h *Handler) htmlToMarkdown(ctx context.Context, url string, mode string) (
 				return libhtml2md.Convert(browserHTML, opts)
 			}
 
-			return libhtml2md.Convert(htmlStr, opts)
+			return libhtml2md.Convert(fr.Body, opts)
 		}
 	}
 

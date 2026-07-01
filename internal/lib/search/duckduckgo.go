@@ -2,23 +2,26 @@ package search
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/enetx/g"
+	"github.com/enetx/surf"
 )
 
 func DuckDuckGo(query string) (*Response, error) {
 	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
 
-	resp, err := http.Get(searchURL)
-	if err != nil {
-		return nil, fmt.Errorf("fetch duckduckgo: %w", err)
+	client := surf.NewClient()
+	result := client.Get(g.NewString(searchURL)).Do()
+	if result.IsErr() {
+		return nil, fmt.Errorf("fetch duckduckgo: %w", result.Err())
 	}
+	resp := result.Ok()
 	defer resp.Body.Close()
 
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	doc, err := goquery.NewDocumentFromReader(resp.Body.Reader)
 	if err != nil {
 		return nil, fmt.Errorf("parse duckduckgo: %w", err)
 	}
