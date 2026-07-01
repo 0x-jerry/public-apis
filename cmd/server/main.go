@@ -13,6 +13,11 @@ func main() {
 	cfg := config.Load()
 	cfg.PrintEnv()
 
+	host := os.Getenv("HOST")
+	if host == "" {
+		host = "127.0.0.1"
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
@@ -20,8 +25,9 @@ func main() {
 
 	handler := app.New(cfg)
 
-	log.Printf("http://localhost:%s", port)
-	if err := http.ListenAndServe(":"+port, handler); err != nil {
+	addr := host + ":" + port
+	log.Printf("http://%s", addr)
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)
 	}
 }
