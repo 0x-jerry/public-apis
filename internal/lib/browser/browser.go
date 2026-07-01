@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"public-apis/internal/config"
+
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/proto"
 )
@@ -53,7 +54,6 @@ func (m *Manager) connect() (*rod.Browser, error) {
 		endpoint = "ws://127.0.0.1:9222"
 	}
 
-
 	browser := rod.New().ControlURL(endpoint)
 	if err := browser.Connect(); err != nil {
 		return nil, err
@@ -83,7 +83,8 @@ func (m *Manager) FetchHTML(ctx context.Context, url string) (string, error) {
 	if err := page.Navigate(url); err != nil {
 		return "", err
 	}
-	page.WaitLoad()
+	
+	page.WaitStable(1 * time.Second)
 
 	return page.HTML()
 }
