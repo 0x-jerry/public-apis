@@ -5,16 +5,17 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"public-apis/internal/auth"
 	"public-apis/internal/config"
 	"public-apis/internal/handler/html2md"
 	"public-apis/internal/handler/img2ascii"
 	"public-apis/internal/handler/index"
 	"public-apis/internal/handler/mcp"
+	"public-apis/internal/handler/proxy"
 	"public-apis/internal/handler/qr"
 	"public-apis/internal/handler/upload"
 	"public-apis/internal/middleware"
-	"github.com/go-chi/chi/v5"
 )
 
 func New(cfg *config.Config) http.Handler {
@@ -28,6 +29,7 @@ func New(cfg *config.Config) http.Handler {
 	r.Mount("/qr", qr.New())
 	r.Mount("/html", html2md.New(cfg))
 	r.Mount("/img-to-ascii", img2ascii.New())
+	r.Mount("/proxy", proxy.New(cfg))
 	r.Mount("/mcp", mcp.New(cfg))
 
 	r.With(auth.Required(cfg)).Mount("/upload", upload.New(cfg))

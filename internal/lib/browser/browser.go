@@ -2,7 +2,9 @@ package browser
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
+	"strings"
 	"sync"
 	"time"
 
@@ -83,8 +85,100 @@ func (m *Manager) FetchHTML(ctx context.Context, url string) (string, error) {
 	if err := page.Navigate(url); err != nil {
 		return "", err
 	}
-	
+
 	page.WaitStable(1 * time.Second)
 
 	return page.HTML()
+}
+
+// FetchResult is the raw result of a browser navigation.
+type FetchResult struct {
+	Body        []byte
+	ContentType string
+	StatusCode  int
+}
+
+// Fetch navigates to url with the headless browser and returns the raw response
+// body (for example HTML or XML) along with its content type and status code.
+// Unlike FetchHTML, it does not render or otherwise transform the document.
+func (m *Manager) Fetch(ctx context.Context, url string) (*FetchResult, error) {
+	b, err := m.Get()
+	if err != nil {
+		return nil, err
+	}
+	if b == nil {
+		return nil, errors.New("browser not available")
+	}
+
+	page, err := b.Page(proto.TargetCreateTarget{})
+	if err != nil {
+		return nil, err
+	}
+	defer page.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	page = page.Context(ctx)
+
+	if err := (proto.NetworkEnable{}).Call(page); err != nil {
+		return nil, err
+	}
+
+	var (
+		requestID   proto.NetworkRequestID
+		contentType string
+		statusCode  int
+	)
+
+	// Capture the final document response, skipping redirect hops.
+	wait := page.EachEvent(func(e *proto.NetworkResponseReceived) bool {
+		if e.Type != proto.NetworkResourceTypeDocument {
+			return false
+		}
+		if e.Response.Status >= 300 && e.Response.Status < 400 {
+			return false
+		}
+
+		requestID = e.RequestID
+		statusCode = e.Response.Status
+		contentType = e.Response.MIMEType
+
+		for key, value := range e.Response.Headers {
+			if strings.EqualFold(key, "content-type") {
+				contentType = value.Str()
+				break
+			}
+		}
+
+		return true
+	})
+
+	if err := page.Navigate(url); err != nil {
+		return nil, err
+	}
+	wait()
+
+	if requestID == "" {
+		return nil, errors.New("no document response received")
+	}
+
+	res, err := proto.NetworkGetResponseBody{RequestID: requestID}.Call(page)
+	if err != nil {
+		return nil, err
+	}
+
+	body := []byte(res.Body)
+	if res.Base64Encoded {
+		body, err = base64.StdEncoding.DecodeString(res.Body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &FetchResult{
+		Body:        body,
+		ContentType: contentType,
+		StatusCode:  statusCode,
+	}, nil
 }

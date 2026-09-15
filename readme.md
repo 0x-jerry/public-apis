@@ -95,6 +95,27 @@ Fetches a remote image and converts it to ASCII art.
 
 ---
 
+### URL Proxy
+
+#### Fetch a URL
+```
+GET /proxy?url=<url>
+```
+
+Fetches the target URL through the headless browser (see `BROWSER_WS`/`BROWSER_WS_ENABLED`) and returns the raw response body (HTML, XML, etc.) along with the upstream status code and content type.
+
+**Query Parameters:**
+
+| Param | Type   | Description                            |
+|-------|--------|----------------------------------------|
+| `url` | string | Absolute `http`/`https` URL to fetch   |
+
+**Response:** The upstream status code, `Content-Type`, and raw body.
+
+Requires the headless browser to be enabled (`BROWSER_WS_ENABLED=true`); otherwise the request fails with `502 Bad Gateway`. Targets resolving to private, loopback, link-local, or multicast addresses are rejected with `502 Bad Gateway`.
+
+---
+
 ### MCP Server
 
 This project exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server using the SSE transport.
