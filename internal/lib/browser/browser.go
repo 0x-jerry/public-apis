@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -32,6 +33,7 @@ func (m *Manager) isEnabled() bool {
 
 func (m *Manager) Get() (*rod.Browser, error) {
 	if !m.isEnabled() {
+		log.Printf("browser: not enabled")
 		return nil, nil
 	}
 
@@ -47,6 +49,10 @@ func (m *Manager) Get() (*rod.Browser, error) {
 		m.browser, m.connErr = m.connect()
 	})
 
+	if m.connErr != nil {
+		log.Printf("browser: unavailable: %v", m.connErr)
+	}
+
 	return m.browser, m.connErr
 }
 
@@ -56,10 +62,13 @@ func (m *Manager) connect() (*rod.Browser, error) {
 		endpoint = "ws://127.0.0.1:9222"
 	}
 
+	log.Printf("browser: connecting to %s", endpoint)
 	browser := rod.New().ControlURL(endpoint)
 	if err := browser.Connect(); err != nil {
+		log.Printf("browser: connect to %s failed: %v", endpoint, err)
 		return nil, err
 	}
+	log.Printf("browser: connected to %s", endpoint)
 	return browser, nil
 }
 
